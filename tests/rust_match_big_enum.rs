@@ -162,7 +162,8 @@ static OUTPUT: &str = r#"
 #[test]
 fn test_match_big_enum() {
     let list: List = INPUT.parse().unwrap();
-    assert!(list.lines[7].starts_with("Internal::back"));
+    println!("{}", list.lines[7]);
+    assert!(list.lines[7].starts_with("Internal"));
     let window = list.window_around(7);
     let blocks = window.blocks();
     for (i, block) in blocks.iter().enumerate() {

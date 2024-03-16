@@ -74,7 +74,6 @@ pub fn on_event(
 #[test]
 fn test_match_struct_with_spaces() {
     let list: List = INPUT.parse().unwrap();
-    println!("{}", list.lines[26].inner());
     assert!(list.lines[26].content().contains("// anything else"));
     let window = list.window_around(26);
     dbg!((window.start, window.end));

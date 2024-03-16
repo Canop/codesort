@@ -43,9 +43,10 @@ fn braces_are_balanced(braces: &[u8]) -> bool {
 
 /// A piece of code made of complete lines, with balanced braces
 /// and some significant content
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Balanced {
-    pub last_significant_char: u8,
+    //pub braces: Vec<u8>,
+    pub last_significant_char: char,
     pub language: Language,
 }
 

@@ -19,61 +19,19 @@ impl Window {
     pub fn blocks(&self) -> Vec<Block> {
         let mut blocks = Vec::new();
         let mut current_block = None;
-        tprintln!("Computing blocks -----------------");
         for line_idx in self.start..self.end {
-            let line = &self.list.lines[line_idx];
-            tprint!("{line_idx} : {}", line.content());
             let Some(block) = current_block.as_mut() else {
-                current_block = Some(Block::new(line_idx, line.indent()));
-                tprintln!(" -> new block");
-                if !line.is_empty() && !line.is_comment_or_attribute() {
-                    if line.is_closing() && !line.is_opening() {
-                        tprintln!(" -> immediate close");
-                        blocks.push(current_block.take().unwrap());
-                    }
+                let block = Block::new(line_idx, &self.list);
+                if block.is_complete() {
+                    blocks.push(block);
+                } else {
+                    current_block = Some(block);
                 }
                 continue;
             };
-            if !line.is_empty() && line.indent() > block.base_indent {
-                tprintln!(" -> deep");
-                if block.has_only_empty_lines(&self.list) {
-                    block.base_indent = line.indent();
-                }
-                block.augment();
-            } else if line.is_opening() {
-                tprintln!(" -> redive");
-                block.augment();
-            } else if line.is_closing() {
-                tprintln!(" -> closing");
-                block.augment();
+            block.augment(&self.list);
+            if block.is_complete() {
                 blocks.push(current_block.take().unwrap());
-            } else if block.contains_only_comments(&self.list) {
-                if line.is_comment_or_attribute() {
-                    tprintln!(" -> opening comments");
-                } else {
-                    tprintln!(" -> real start after comments");
-                }
-                block.augment();
-            } else if line.is_empty() {
-                if block.is_end_deep(&self.list) {
-                    tprintln!(" -> empty line while deep");
-                    block.augment();
-                    continue;
-                }
-                if let Some(idx) = self.list.first_not_empty_line_after(line_idx) {
-                    if self.list.lines[idx].indent() > block.base_indent {
-                        tprintln!(" -> empty line, next is deeper");
-                        block.augment();
-                        continue;
-                    }
-                }
-                tprintln!(" -> close on empty line + open block");
-                blocks.push(current_block.take().unwrap());
-                current_block = Some(Block::new(line_idx, line.indent()));
-            } else {
-                tprintln!(" -> close  + open block");
-                blocks.push(current_block.take().unwrap());
-                current_block = Some(Block::new(line_idx, line.indent()));
             }
         }
         if let Some(block) = current_block {

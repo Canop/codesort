@@ -1,9 +1,3 @@
-macro_rules! tprint {
-    ($($arg:tt)*) => {
-        #[cfg(feature = "explain")]
-        println!($($arg)*);
-    }
-}
 macro_rules! tprintln {
     ($($arg:tt)*) => {
         #[cfg(feature = "explain")]
@@ -11,7 +5,4 @@ macro_rules! tprintln {
     }
 }
 
-pub(crate) use {
-    tprint,
-    tprintln,
-};
+pub(crate) use tprintln;

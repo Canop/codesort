@@ -238,6 +238,7 @@ fn test_trait_functions() {
     let list: List = INPUT.parse().unwrap();
     assert!(list.lines[12].starts_with("fn"));
     let window = list.window_around(12);
+    println!("LAST OF WINDOW: {}", window.list.lines[window.end - 1]);
     let blocks = window.blocks();
     for (i, block) in blocks.iter().enumerate() {
         println!("===== block {}", i);

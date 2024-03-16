@@ -1,4 +1,7 @@
-use super::*;
+use {
+    super::*,
+    crate::*,
+};
 
 /// Return a Balanced if the given code is balanced according to
 /// Rust syntax.
@@ -89,11 +92,13 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
                 } else {
                     braces.push(c);
                 }
+                last_significant_char = Some(c);
             }
             b' ' | b'\t' | b'\n' | b'\r' if !last_is_antislash => {
                 // ignore
             }
             b'\\' if !last_is_antislash => {
+                last_significant_char = Some(c);
                 last_is_antislash = true;
             }
             c => {
@@ -102,8 +107,8 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
             }
         }
     }
-    let last_significant_char = last_significant_char?;
-    println!(
+    let last_significant_char = last_significant_char? as char;
+    tprintln!(
         "braces: {}",
         braces.iter().map(|&c| c as char).collect::<String>()
     );
@@ -131,6 +136,15 @@ fn test_check_balanced_rust_not_balanced_until_end() {
             "    Ok(_) => \"ok\",\n",
             "    Err(_) => \"err\",\n",
             "},\n",
+        ],
+        vec![
+            r#"   Internal::open_leave => {\n"#,
+            r#"       if let Some(selection) = self.selection() {\n"#,
+            r#"           selection.to_opener(con)?\n"#,
+            r#"       } else {\n"#,
+            r#"           CmdResult::error("no selection to open")\n"#,
+            r#"       }\n"#,
+            r#"   }\n"#,
         ],
     ];
     for mut lines in test_cases.drain(..) {
@@ -173,6 +187,6 @@ fn test_check_balanced_rust_ending_in_comma() {
     for code in test_cases.drain(..) {
         println!("{}", code);
         let balanced = check_balanced_rust(&code).unwrap();
-        assert_eq!(balanced.last_significant_char, b',');
+        assert_eq!(balanced.last_significant_char, ',');
     }
 }
