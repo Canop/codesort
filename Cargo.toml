@@ -1,0 +1,12 @@
+[package]
+name = "code-sort"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+explain = []
+
+[dependencies]
+thiserror = "1.0.50"
+
