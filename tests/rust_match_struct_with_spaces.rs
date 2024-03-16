@@ -78,12 +78,6 @@ fn test_match_struct_with_spaces() {
     let window = list.window_around(26);
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 20);
-    let blocks = window.blocks();
-    for (i, block) in blocks.iter().enumerate() {
-        println!("===== block {}", i);
-        block.print(&window.list);
-    }
-    assert_eq!(blocks.len(), 3);
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

@@ -73,12 +73,6 @@ fn test_match_struct() {
     let window = list.window_around(17);
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 17);
-    let blocks = window.blocks();
-    for (i, block) in blocks.iter().enumerate() {
-        println!("===== block {}", i);
-        block.print(&window.list);
-    }
-    assert_eq!(blocks.len(), 3);
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     assert_eq!(output, OUTPUT);

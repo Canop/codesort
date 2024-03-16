@@ -63,11 +63,6 @@ pub struct PanelCmdContext<'c> {
 fn test_match_struct() {
     let list: List = INPUT.parse().unwrap();
     let window = list.into_window();
-    let blocks = window.blocks();
-    for (i, block) in blocks.iter().enumerate() {
-        println!("===== block {}", i);
-        block.print(&window.list);
-    }
     let mut output = String::new();
     write!(&mut output, "{}", window.sort()).unwrap();
     assert_eq!(output, OUTPUT);

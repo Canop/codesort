@@ -48,11 +48,6 @@ fn test_match_literals() {
     let list: List = INPUT.parse().unwrap();
     let window = list.window_around(6);
     dbg!((window.start, window.end));
-    let blocks = window.blocks();
-    for (i, block) in blocks.iter().enumerate() {
-        println!("===== block {}", i);
-        block.print(&window.list);
-    }
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

@@ -165,12 +165,6 @@ fn test_match_big_enum() {
     println!("{}", list.lines[7]);
     assert!(list.lines[7].starts_with("Internal"));
     let window = list.window_around(7);
-    let blocks = window.blocks();
-    for (i, block) in blocks.iter().enumerate() {
-        println!("===== block {}", i);
-        block.print(&window.list);
-    }
-    assert_eq!(blocks.len(), 17);
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

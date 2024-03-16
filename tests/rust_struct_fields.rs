@@ -143,11 +143,6 @@ pub struct Conf {
 fn test_struct_fields() {
     let list: List = INPUT.parse().unwrap();
     let window = list.window_around(5);
-    let blocks = window.blocks();
-    for (i, block) in blocks.iter().enumerate() {
-        println!("===== block {}", i);
-        block.print(&window.list);
-    }
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     assert_eq!(output, OUTPUT);
