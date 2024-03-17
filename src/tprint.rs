@@ -1,8 +1,15 @@
-macro_rules! tprintln {
+#[macro_export]
+macro_rules! tprint {
     ($($arg:tt)*) => {
         #[cfg(feature = "explain")]
-        println!($($arg)*);
+        eprintln!($($arg)*);
     }
 }
 
-pub(crate) use tprintln;
+#[macro_export]
+macro_rules! tprintln {
+    ($($arg:tt)*) => {
+        #[cfg(feature = "explain")]
+        eprintln!($($arg)*);
+    }
+}

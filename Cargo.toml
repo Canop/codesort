@@ -1,12 +1,18 @@
 [package]
 name = "code-sort"
+authors = ["dystroy <denys.seguret@gmail.com>"]
+repository = "https://github.com/Canop/code-sort"
 version = "0.1.0"
 edition = "2021"
+license = "AGPL-3.0"
+rust-version = "1.65"
 
 [features]
 default = []
 explain = []
 
 [dependencies]
+clap = { version = "4.4", features = ["derive", "cargo"] }
+lazy-regex = "3"
 thiserror = "1.0.50"
 

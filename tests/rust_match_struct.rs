@@ -70,7 +70,7 @@ fn test_match_struct() {
     let list: List = INPUT.parse().unwrap();
     println!("{}", list.lines[17].content());
     assert!(list.lines[17].starts_with("TimedEvent {"));
-    let window = list.window_around(17);
+    let window = list.window_around(17).unwrap();
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 17);
     let mut output = String::new();

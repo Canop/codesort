@@ -1,5 +1,6 @@
 use crate::*;
 
+/// Line indices are 0-based.
 pub struct Window {
     /// The lines of the complete file
     pub list: List,
@@ -15,6 +16,9 @@ impl Window {
     }
     pub fn is_empty(&self) -> bool {
         self.end <= self.start
+    }
+    pub fn range(&self) -> std::ops::Range<usize> {
+        self.start..self.end
     }
     pub fn blocks(&self) -> Vec<Block> {
         let mut blocks = Vec::new();

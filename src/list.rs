@@ -6,6 +6,7 @@ use {
     },
 };
 
+///
 #[derive(Debug, Clone)]
 pub struct List {
     pub lines: Vec<Line>,
@@ -34,41 +35,98 @@ impl List {
         }
         Ok(List { lines })
     }
+    pub fn line_by_number(
+        &self,
+        line_number: LineNumber,
+    ) -> Option<&str> {
+        self.lines
+            .get(line_number.to_index())
+            .map(|line| line.content())
+    }
+    fn has_not_empty_line_at(
+        &self,
+        line_idx: usize,
+    ) -> bool {
+        line_idx < self.lines.len() && !self.lines[line_idx].is_empty()
+    }
+    pub fn non_empty_line_around(
+        &self,
+        line_idx: LineIndex,
+    ) -> Option<usize> {
+        if self.has_not_empty_line_at(line_idx) {
+            return Some(line_idx);
+        }
+        if self.has_not_empty_line_at(line_idx + 1) {
+            return Some(line_idx);
+        }
+        if self.has_not_empty_line_at(line_idx - 1) {
+            return Some(line_idx);
+        }
+        if self.has_not_empty_line_at(line_idx + 2) {
+            return Some(line_idx);
+        }
+        if self.has_not_empty_line_at(line_idx - 2) {
+            return Some(line_idx);
+        }
+        None
+    }
+    /// Determine the biggest possible range around a line
+    ///
+    /// (takes a 1-based line number)
+    pub fn window_around_line(
+        self,
+        line_number: LineNumber,
+    ) -> CsResult<Window> {
+        Self::window_around(self, line_number.to_index())
+    }
     /// Determine the biggest possible range around a line index
     ///
-    /// Return an empty window if the line index is out of bounds
+    /// (takes a 0-based line index)
     pub fn window_around(
         self,
-        line_idx: usize,
-    ) -> Window {
+        line_idx: LineIndex,
+    ) -> CsResult<Window> {
+        let Some(line_idx) = self.non_empty_line_around(line_idx) else {
+            return Err(CsError::NoSortableRangeAround(line_idx));
+        };
         let mut start = line_idx;
         let mut end = line_idx;
-        if line_idx < self.lines.len() {
-            let indent = self.lines[line_idx].indent();
-            while start > 0 && self.lines[start - 1].can_extend(indent) {
-                start -= 1;
-            }
-            while end < self.lines.len() - 1 && self.lines[end + 1].can_extend(indent) {
-                end += 1;
-            }
+        let indent = self.lines[line_idx].indent();
+        while start > 0 && self.lines[start - 1].can_extend(indent) {
+            start -= 1;
+        }
+        while end < self.lines.len() - 1 && self.lines[end + 1].can_extend(indent) {
             end += 1;
         }
-        Window {
+        end += 1;
+        Ok(Window {
             list: self,
             start,
             end,
-        }
+        })
     }
+    /// Build a window on a range of 0-based line indices,
+    /// end not included
     pub fn window_on_range(
         self,
-        start: usize,
-        end: usize,
-    ) -> Window {
-        Window {
+        start: LineIndex,
+        end: LineIndex,
+    ) -> CsResult<Window> {
+        if end <= start {
+            return Err(CsError::InvalidRange { start, end });
+        }
+        Ok(Window {
             list: self,
             start,
             end,
-        }
+        })
+    }
+    /// Build a window on a range
+    pub fn window_on_line_range(
+        self,
+        range: LineNumberRange,
+    ) -> CsResult<Window> {
+        Self::window_on_range(self, range.start.to_index(), range.end.to_index() + 1)
     }
     pub fn into_window(self) -> Window {
         let end = self.lines.len();

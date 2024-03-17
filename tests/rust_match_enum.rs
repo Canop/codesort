@@ -54,7 +54,7 @@ fn test_match_enum() {
     }
     "#;
     let list: List = INPUT.parse().unwrap();
-    let window = list.window_around(7);
+    let window = list.window_around(7).unwrap();
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

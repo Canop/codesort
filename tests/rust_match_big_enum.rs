@@ -164,7 +164,7 @@ fn test_match_big_enum() {
     let list: List = INPUT.parse().unwrap();
     println!("{}", list.lines[7]);
     assert!(list.lines[7].starts_with("Internal"));
-    let window = list.window_around(7);
+    let window = list.window_around(7).unwrap();
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

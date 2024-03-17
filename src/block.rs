@@ -26,6 +26,9 @@ impl Block {
             base_indent: line.indent(),
         }
     }
+    pub fn content(&self) -> &str {
+        &self.code
+    }
     pub fn start(&self) -> usize {
         self.start
     }

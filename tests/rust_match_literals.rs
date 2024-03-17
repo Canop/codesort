@@ -46,7 +46,7 @@ fn test_match_literals() {
     "#;
 
     let list: List = INPUT.parse().unwrap();
-    let window = list.window_around(6);
+    let window = list.window_around(6).unwrap();
     dbg!((window.start, window.end));
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();

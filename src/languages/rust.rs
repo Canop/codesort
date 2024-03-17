@@ -1,7 +1,4 @@
-use {
-    super::*,
-    crate::*,
-};
+use super::*;
 
 /// Return a Balanced if the given code is balanced according to
 /// Rust syntax.
@@ -108,10 +105,10 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
         }
     }
     let last_significant_char = last_significant_char? as char;
-    tprintln!(
-        "braces: {}",
-        braces.iter().map(|&c| c as char).collect::<String>()
-    );
+    //tprintln!(
+    //    "braces: {}",
+    //    braces.iter().map(|&c| c as char).collect::<String>()
+    //);
     if !braces_are_balanced(&braces) {
         return None;
     }
@@ -186,7 +183,7 @@ fn test_check_balanced_rust_ending_in_comma() {
     ];
     for code in test_cases.drain(..) {
         println!("{}", code);
-        let balanced = check_balanced_rust(&code).unwrap();
+        let balanced = check_balanced_rust(code).unwrap();
         assert_eq!(balanced.last_significant_char, ',');
     }
 }
