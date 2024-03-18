@@ -1,4 +1,4 @@
-mod rust;
+pub mod rust;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Language {
@@ -39,19 +39,4 @@ fn braces_are_balanced(braces: &[u8]) -> bool {
         }
     }
     stack.is_empty()
-}
-
-/// A piece of code made of complete lines, with balanced braces
-/// and some significant content
-#[derive(Debug, Clone)]
-pub struct Balanced {
-    //pub braces: Vec<u8>,
-    pub last_significant_char: char,
-    pub language: Language,
-}
-
-impl Balanced {
-    pub fn new(code: &str) -> Option<Self> {
-        rust::check_balanced_rust(code)
-    }
 }

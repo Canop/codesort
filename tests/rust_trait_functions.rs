@@ -238,7 +238,6 @@ fn test_trait_functions() {
     let list: List = INPUT.parse().unwrap();
     assert!(list.lines[12].starts_with("fn"));
     let window = list.window_around(12).unwrap();
-    println!("LAST OF WINDOW: {}", window.list.lines[window.end - 1]);
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

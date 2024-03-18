@@ -34,39 +34,53 @@ impl Window {
                 continue;
             };
             block.augment(&self.list);
-            if block.is_complete() {
+            if block.is_complete() && !block.is_empty() {
                 blocks.push(current_block.take().unwrap());
             }
         }
         if let Some(block) = current_block {
             blocks.push(block);
         }
-        blocks
+        // before returning, we merge annotation blocks
+        let mut merged_blocks: Vec<Block> = Vec::new();
+        for mut block in blocks.drain(..) {
+            if merged_blocks.last().map_or(false, |last| last.is_annotation()) {
+                let last = merged_blocks.pop().unwrap();
+                block.start = last.start;
+                block.code = last.code + &block.code;
+            }
+            merged_blocks.push(block);
+        }
+        merged_blocks
     }
     pub fn sort_blocks(
         &self,
         blocks: &mut [Block],
     ) {
         blocks.sort_by(|a, b| {
-            let mut ai = a.start();
-            let mut bi = b.start();
-            while ai < self.end && self.list.lines[ai].exclude_from_sort() {
-                ai += 1;
-            }
-            while bi < self.end && self.list.lines[bi].exclude_from_sort() {
-                bi += 1;
-            }
-            while ai < a.end() && bi < b.end() {
-                match self.list.lines[ai].inner().cmp(self.list.lines[bi].inner()) {
-                    std::cmp::Ordering::Equal => {
-                        ai += 1;
-                        bi += 1;
-                    }
-                    other => return other,
-                }
-            }
-            std::cmp::Ordering::Equal
+            // we should only sort blocks with a "balanced"
+            a.sort_key().cmp(b.sort_key())
         });
+        // blocks.sort_by(|a, b| {
+        //     let mut ai = a.start();
+        //     let mut bi = b.start();
+        //     while ai < self.end && self.list.lines[ai].exclude_from_sort() {
+        //         ai += 1;
+        //     }
+        //     while bi < self.end && self.list.lines[bi].exclude_from_sort() {
+        //         bi += 1;
+        //     }
+        //     while ai < a.end() && bi < b.end() {
+        //         match self.list.lines[ai].inner().cmp(self.list.lines[bi].inner()) {
+        //             std::cmp::Ordering::Equal => {
+        //                 ai += 1;
+        //                 bi += 1;
+        //             }
+        //             other => return other,
+        //         }
+        //     }
+        //     std::cmp::Ordering::Equal
+        // });
     }
     pub fn sort(self) -> List {
         let mut blocks = self.blocks();

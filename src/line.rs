@@ -68,10 +68,10 @@ impl Line {
     pub fn is_empty(&self) -> bool {
         self.content.trim().is_empty()
     }
-    /// Returns true if the line is a comment, a doc comment,
-    /// a rust attribute, etc.
     pub fn is_comment_or_attribute(&self) -> bool {
-        self.indent == self.inner_end || self.starts_with("#")
+        self.indent == self.inner_end
+            || self.starts_with("#") // comment in some languages, attribute in rust
+            || self.starts_with("@") // Java annotation
     }
     pub fn is_opening(&self) -> bool {
         self.ends_with("{") || self.ends_with("(")
@@ -85,8 +85,15 @@ impl Line {
     ) -> bool {
         self.indent() >= indent || self.is_empty()
     }
+    /// Returns true if the line is empty, a comment, a doc comment,
+    /// a rust attribute, etc.
+    ///
+    /// Those lines must be ignored when sorting
     pub fn exclude_from_sort(&self) -> bool {
-        self.is_comment_or_attribute() || self.is_empty()
+        self.is_empty()
+            || self.indent == self.inner_end // contains only line-end comments
+            || self.starts_with("#") // comment in some languages, attribute in rust
+            || self.starts_with("@") // Java annotation
     }
 }
 

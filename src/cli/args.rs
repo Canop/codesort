@@ -4,13 +4,10 @@ use {
     std::path::PathBuf,
 };
 
+/// Sort code blocks - see https://github.com/Canop/code-sort
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
-    /// sort the block around this 1-based line number
-    #[arg(long)]
-    pub around: Option<LineNumber>,
-
     /// sort this start:end range of 1 based lines, both ends included
     #[arg(long)]
     pub range: Option<LineNumberRange>,
@@ -23,7 +20,11 @@ pub struct Args {
     #[arg(long)]
     pub dst: Option<PathBuf>,
 
-    /// file to sort in place (shortcut for --src and --dest)
+    /// file to sort in place (shortcut for --src and --dst)
     #[arg(short, long)]
     pub file: Option<PathBuf>,
+
+    /// sort the block around this 1-based line number
+    #[arg(long)]
+    pub around: Option<LineNumber>,
 }

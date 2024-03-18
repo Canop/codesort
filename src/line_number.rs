@@ -12,7 +12,7 @@ use {
 /// A 1-based line number, as used in most text editors
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LineNumber {
-    number: NonZeroUsize,
+    pub number: NonZeroUsize,
 }
 
 /// A range of 1-based line numbers, both ends included
@@ -50,6 +50,9 @@ impl FromStr for LineNumberRange {
 }
 
 impl LineNumber {
+    pub fn new(number: usize) -> Option<Self> {
+        NonZeroUsize::new(number).map(|number| LineNumber { number })
+    }
     pub fn to_index(&self) -> LineIndex {
         self.number.get() - 1
     }
@@ -62,4 +65,18 @@ impl std::fmt::Display for LineNumber {
     ) -> std::fmt::Result {
         write!(f, "{}", self.number)
     }
+}
+
+
+/// A macro to create a `LineNumber` from a literal, assuming that since it's
+/// a literal you're calling it with a strictly positive integer.
+#[macro_export]
+macro_rules! line_number {
+    ($n:literal) => {
+        LineNumber {
+            number: unsafe {
+                std::num::NonZeroUsize::new_unchecked($n)
+            }
+        }
+    };
 }

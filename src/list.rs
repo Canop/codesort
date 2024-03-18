@@ -6,7 +6,7 @@ use {
     },
 };
 
-///
+/// A text, as a list of lines
 #[derive(Debug, Clone)]
 pub struct List {
     pub lines: Vec<Line>,
@@ -34,6 +34,14 @@ impl List {
             lines.push(Line::from(content));
         }
         Ok(List { lines })
+    }
+    pub fn inner_line_by_number(
+        &self,
+        line_number: LineNumber,
+    ) -> Option<&str> {
+        self.lines
+            .get(line_number.to_index())
+            .map(|line| line.inner())
     }
     pub fn line_by_number(
         &self,
@@ -146,6 +154,12 @@ impl List {
             }
         }
         None
+    }
+    /// Print the lines, for debug
+    pub fn tprint(&self) {
+        for (i, line) in self.lines.iter().enumerate() {
+            print!("{:>3} | {}", i + 1, line.content());
+        }
     }
 }
 

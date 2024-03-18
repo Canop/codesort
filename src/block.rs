@@ -1,12 +1,12 @@
 use crate::*;
 
-/// a "block" of code
+/// a "block" of code, for a given list
 #[derive(Debug, Clone)]
 pub struct Block {
-    code: String,
-    balanced: Option<Balanced>,
-    start: usize,
-    end: usize, // index of the first line not included
+    pub code: String,
+    pub balanced: Option<Balanced>,
+    pub start: usize,
+    pub end: usize, // index of the first line not included
     pub base_indent: usize,
 }
 
@@ -53,13 +53,29 @@ impl Block {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
+    /// is the block an annotation which should be merged with
+    /// a following block (unless it's the last one)
+    ///
+    pub fn is_annotation(&self) -> bool {
+        self.balanced.as_ref().map_or(false, |b| b.is_annotation)
+    }
     pub fn is_complete(&self) -> bool {
         match self.balanced {
             Some(ref balanced) => match balanced.last_significant_char {
-                ';' | '}' | ',' => true,
+                Some(';' | '}' | ',' | ']') => true,
                 _ => false,
             },
             None => false,
         }
+    }
+    /// the key to use for sorting
+    ///
+    /// If the block is empty, it should be at the end (it was originally
+    /// at the end or it would have been merged during block extraction)
+    pub fn sort_key(&self) -> &str {
+        self.balanced
+            .as_ref()
+            .filter(|b| !b.is_empty())
+            .map_or("~~", |b| &b.sort_key)
     }
 }

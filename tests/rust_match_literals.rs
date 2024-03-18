@@ -47,7 +47,15 @@ fn test_match_literals() {
 
     let list: List = INPUT.parse().unwrap();
     let window = list.window_around(6).unwrap();
-    dbg!((window.start, window.end));
+
+    let blocks = window.blocks();
+    tprintln!("blocks:");
+    for block in blocks {
+        tprint!("\n------\n{}", block.sort_key());
+        //tprint!("\n------\n{}", block.content());
+    }
+
+
     let mut output = String::new();
     write!(output, "{}", window.sort()).unwrap();
     println!("{}", output);

@@ -1,3 +1,4 @@
+mod balanced;
 mod block;
 mod comments;
 mod error;
@@ -9,7 +10,9 @@ mod tprint;
 mod window;
 
 use comments::*;
+
 pub use {
+    balanced::*,
     block::*,
     error::*,
     languages::*,

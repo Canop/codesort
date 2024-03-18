@@ -1,16 +1,9 @@
-use {
-    super::*,
-    crate::*,
-};
+use super::*;
 
 /// Return a Balanced if the given code is balanced according to
-/// Rust syntax.
-///
-/// rust attributes (i.e. `#[...]`) are not tested because they
-/// should be balanced anyway
-pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
+/// javascript syntax.
+pub fn check_balanced_javascript(s: &str) -> Option<Balanced> {
     let bytes = s.as_bytes();
-    let mut sort_key = String::new();
     let mut braces = Vec::new();
     let mut last_is_antislash = false;
     let mut iter = bytes.iter().enumerate();
@@ -43,8 +36,6 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
                             {
                                 break; // end of raw string
                             }
-                        } else {
-                            sort_key.push(c as char);
                         }
                     }
                 } else {
@@ -55,8 +46,6 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
                         };
                         if c == b'"' && !last_is_antislash {
                             break; // end of string
-                        } else {
-                            sort_key.push(c as char);
                         }
                         last_is_antislash = c == b'\\';
                     }
@@ -98,7 +87,6 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
                     braces.push(c);
                 }
                 last_significant_char = Some(c);
-                sort_key.push(c as char);
             }
             b' ' | b'\t' | b'\n' | b'\r' if !last_is_antislash => {
                 // ignore
@@ -108,13 +96,12 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
                 last_is_antislash = true;
             }
             c => {
-                sort_key.push(c as char);
                 last_significant_char = Some(c);
                 last_is_antislash = false;
             }
         }
     }
-    let last_significant_char = last_significant_char.map(|c| c as char);
+    let last_significant_char = last_significant_char? as char;
     //tprintln!(
     //    "braces: {}",
     //    braces.iter().map(|&c| c as char).collect::<String>()
@@ -122,16 +109,7 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
     if !braces_are_balanced(&braces) {
         return None;
     }
-    if sort_key.starts_with("_") {
-        // A block starting with '_' in Rust should be sorted last
-        // (it's probably the fallback case in a match)
-        unsafe {
-            sort_key.as_bytes_mut()[0] = b'~';
-        }
-    }
     Some(Balanced {
-        is_annotation: sort_key.starts_with("#"),
-        sort_key,
         last_significant_char,
         language: Language::Rust,
     })
@@ -172,10 +150,8 @@ fn test_check_balanced_rust_not_balanced_until_end() {
         for (i, line) in lines.iter().enumerate() {
             code.push_str(line);
             dbg!(check_balanced_rust(&code));
-            let balanced = check_balanced_rust(&code)
-                .filter(|b| b.last_significant_char.is_some());
             assert!(
-                balanced.is_none(),
+                check_balanced_rust(&code).is_none(),
                 "line {} shouldn't balance",
                 i
             );
@@ -188,23 +164,3 @@ fn test_check_balanced_rust_not_balanced_until_end() {
     }
 }
 
-#[test]
-fn test_check_balanced_rust_ending_in_comma() {
-    let mut test_cases = vec![
-        r#"
-            SpecialHandlingShortcut::None => SpecialHandling {
-                show: Default, list: Default, sum: Default,
-            }, // some inane comment
-            "#,
-        r#"
-            /// Obsolete, kept for compatibility: you should now use capture_mouse
-            #[serde(alias="disable-mouse-capture")]
-            pub disable_mouse_capture: Option<bool>,
-            "#,
-    ];
-    for code in test_cases.drain(..) {
-        println!("{}", code);
-        let balanced = check_balanced_rust(code).unwrap();
-        assert_eq!(balanced.last_significant_char, Some(','));
-    }
-}
