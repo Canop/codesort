@@ -13,6 +13,8 @@ explain = []
 
 [dependencies]
 clap = { version = "4.4", features = ["derive", "cargo"] }
+clap-help = "1.2.0"
 lazy-regex = "3"
+termimad = "0.29"
 thiserror = "1.0.50"
 

@@ -18,25 +18,18 @@ Of course you can't just sort lines if you want the code to keep working and the
 
 Sorting code manually is a tedious and boring task.
 
-That's where you can use **code-sort**.
+**code-sort** can sort struct fields, struct variants, enum variants, type declarations, match arms of any kind, function declarations, etc.
 
 ## Example
 
 
-## How code-sort works
-
-3 operations are at the core of code-sort
-
-1. select the optimal range to sort around the given line (optional, you can also specify)
-2. determine the entries
-3.
-
-
 ## Install code-sort
+
+## Usage
 
 ## Integrate code-sort in a code editor
 
-By default, **code-sort** takes the code to sort from stdin and writes the sorted code on stdout.
+By default, **code-sort** takes the code to sort from stdin and writes the sorted code to stdout.
 
 It can sort either the whole input, a given range (with `--range`), or select the best range around a given line (using `--around`).
 
@@ -70,15 +63,21 @@ With the following binding typing the leader key then 'cs' will automatically se
 " sort the optimal range around the current line
 nnoremap <Leader>cs ma<ESC>:execute ":%!code-sort --around ".line('.')<CR>`a
 ```
-
 Explanation of the command:
 
 * the current position is saved in the `a` register with `ma`
 * the command including the line number is built then executed with `:execute`
-* the previous position is restored with `a
+* the previous position is then restored
 
 ## Supported Code kinds
 
+3 code analyzers are available now:
+
+* Rust, which should work for C too
+* Java
+* JavaScript
+
+Contributions for other languages would be welcome.
 
 ## Licence
 

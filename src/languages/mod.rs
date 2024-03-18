@@ -4,7 +4,7 @@ pub mod rust;
 
 use {
     crate::*,
-    std::str::FromStr,
+    std::path::Path,
 };
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -17,7 +17,6 @@ pub enum Language {
     /// No idea whethe it works for TypeScript
     JavaScript,
 }
-pub static LANGUAGES: &[Language] = &[Language::Rust, Language::JavaScript];
 
 impl Language {
     pub fn check_balanced(
@@ -28,6 +27,15 @@ impl Language {
             Language::Rust => rust::check_balanced(s),
             Language::Java => java::check_balanced(s),
             Language::JavaScript => javascript::check_balanced(s),
+        }
+    }
+    pub fn detect(path: &Path) -> Option<Language> {
+        let ext = path.extension()?.to_str()?;
+        match ext {
+            "rs" => Some(Language::Rust),
+            "java" => Some(Language::Java),
+            "js" => Some(Language::JavaScript),
+            _ => None,
         }
     }
 }
@@ -63,15 +71,4 @@ fn braces_are_balanced(braces: &[u8]) -> bool {
         }
     }
     stack.is_empty()
-}
-
-impl FromStr for Language {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "rust" => Ok(Language::Rust),
-            "javascript" | "js" => Ok(Language::JavaScript),
-            _ => Err(format!("unknown language: {}", s)),
-        }
-    }
 }

@@ -16,9 +16,22 @@ use {
 /// Run the cli application
 pub fn run() -> CsResult<()> {
     let args = Args::parse();
+
+    if args.help {
+        args.print_help();
+        return Ok(());
+    }
+
+    if args.version {
+        println!("code-sort {}", env!("CARGO_PKG_VERSION"));
+        return Ok(());
+    }
+
     let src = args.src.as_ref().or(args.file.as_ref());
     let dst = args.dst.as_ref().or(args.file.as_ref());
-    let lang = args.lang.unwrap_or_default();
+    let lang = args.lang();
+
+    tprintln!("lang: {:?}", lang);
 
     // Read input
     let list = if let Some(src) = src {
@@ -54,10 +67,11 @@ pub fn run() -> CsResult<()> {
     {
         let mut blocks = window.blocks()?;
         window.sort_blocks(&mut blocks);
-        tprintln!("blocks:");
+        tprintln!("===== blocks:");
         for block in blocks {
             tprintln!("\n------\n{}", block.content());
         }
+        tprintln!("=====");
     }
     let sorted_list = window.sort()?;
 
