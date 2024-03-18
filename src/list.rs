@@ -35,14 +35,6 @@ impl List {
         }
         Ok(List { lines })
     }
-    pub fn inner_line_by_number(
-        &self,
-        line_number: LineNumber,
-    ) -> Option<&str> {
-        self.lines
-            .get(line_number.to_index())
-            .map(|line| line.inner())
-    }
     pub fn line_by_number(
         &self,
         line_number: LineNumber,

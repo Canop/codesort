@@ -58,29 +58,8 @@ impl Window {
         blocks: &mut [Block],
     ) {
         blocks.sort_by(|a, b| {
-            // we should only sort blocks with a "balanced"
             a.sort_key().cmp(b.sort_key())
         });
-        // blocks.sort_by(|a, b| {
-        //     let mut ai = a.start();
-        //     let mut bi = b.start();
-        //     while ai < self.end && self.list.lines[ai].exclude_from_sort() {
-        //         ai += 1;
-        //     }
-        //     while bi < self.end && self.list.lines[bi].exclude_from_sort() {
-        //         bi += 1;
-        //     }
-        //     while ai < a.end() && bi < b.end() {
-        //         match self.list.lines[ai].inner().cmp(self.list.lines[bi].inner()) {
-        //             std::cmp::Ordering::Equal => {
-        //                 ai += 1;
-        //                 bi += 1;
-        //             }
-        //             other => return other,
-        //         }
-        //     }
-        //     std::cmp::Ordering::Equal
-        // });
     }
     pub fn sort(self) -> List {
         let mut blocks = self.blocks();
