@@ -14,11 +14,11 @@
 
 Sometimes, an enum or a struct can become big enough that it's easier to keep track of its use, for example `match` arms, when the code is alphabetically sorted.
 
-Of course you can't just sort lines if you want the code to keep working and the comments (and annotations, attributes, etc.) to follow the code.
+Of course you can't just sort lines if you want the code to keep working and the comments (and annotations, attributes, spacing, etc.) to follow the code.
 
 Sorting code manually is a tedious and boring task.
 
-**code-sort** can sort struct fields, struct variants, enum variants, type declarations, match arms of any kind, function declarations, etc.
+**code-sort** can sort struct fields, struct variants, enum variants, type declarations, match/switch arms of any kind, function declarations, etc.
 
 ## Example
 
@@ -27,7 +27,7 @@ Sorting code manually is a tedious and boring task.
 
 ## Usage
 
-## Integrate code-sort in a code editor
+## Integrate code-sort in your code editor
 
 By default, **code-sort** takes the code to sort from stdin and writes the sorted code to stdout.
 
@@ -37,7 +37,7 @@ You can also change the input and output to be files, with `--src` and `--dst`.
 
 Those options make it easy to integrate code-sort in any editor. See below for vim.
 
-## Integrate code-sort in vim
+## Use code-sort in vim
 
 #### Sort the selection
 
@@ -57,12 +57,15 @@ Press the `enter` key: the selection is sorted with code-sort.
 You don't usually have to select the zone to sort.
 You can ask code-sort to automatically select the zone to sort around your current line.
 
-With the following binding typing the leader key then 'cs' will automatically select the set of blocs around the current line and sort it. The buffer won't be saved so you can undo or save yourself.
+Define this binding in your vim configuration:
 
 ```
 " sort the optimal range around the current line
 nnoremap <Leader>cs ma<ESC>:execute ":%!code-sort --around ".line('.')<CR>`a
 ```
+
+Typing the leader key then 'cs' will automatically select the set of blocs around the current line and sort it.
+
 Explanation of the command:
 
 * the current position is saved in the `a` register with `ma`
