@@ -1,3 +1,4 @@
+pub mod java;
 pub mod javascript;
 pub mod rust;
 
@@ -11,6 +12,9 @@ pub enum Language {
     /// Should also work for C, and maybe others
     #[default]
     Rust,
+    /// It should work, but I didn't do much Java in recent years
+    Java,
+    /// No idea whethe it works for TypeScript
     JavaScript,
 }
 pub static LANGUAGES: &[Language] = &[Language::Rust, Language::JavaScript];
@@ -22,6 +26,7 @@ impl Language {
     ) -> Option<Balanced> {
         match self {
             Language::Rust => rust::check_balanced(s),
+            Language::Java => java::check_balanced(s),
             Language::JavaScript => javascript::check_balanced(s),
         }
     }

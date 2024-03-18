@@ -16,7 +16,8 @@ pub struct Args {
     #[arg(long)]
     pub range: Option<LineNumberRange>,
 
-    /// The language of the code to sort (default: Rust)
+    /// The language of the code to sort (default: rust)
+    /// Possible values: rust, java, javascript
     #[arg(short, long)]
     pub lang: Option<Language>,
 

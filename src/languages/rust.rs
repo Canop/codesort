@@ -127,6 +127,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
         }
     }
     Some(Balanced {
+        // "annotations" in Rust are attributes
         is_annotation: sort_key.starts_with('#'),
         sort_key,
         last_significant_char,
