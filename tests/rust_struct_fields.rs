@@ -144,6 +144,6 @@ fn test_struct_fields() {
     let list: List = INPUT.parse().unwrap();
     let window = list.window_around(5).unwrap();
     let mut output = String::new();
-    write!(output, "{}", window.sort()).unwrap();
+    write!(output, "{}", window.sort().unwrap()).unwrap();
     assert_eq!(output, OUTPUT);
 }

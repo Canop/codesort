@@ -79,7 +79,7 @@ fn test_match_struct_with_spaces() {
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 20);
     let mut output = String::new();
-    write!(output, "{}", window.sort()).unwrap();
+    write!(output, "{}", window.sort().unwrap()).unwrap();
     println!("{}", output);
     assert_eq!(output, OUTPUT);
 }

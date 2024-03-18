@@ -122,7 +122,7 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
     if !braces_are_balanced(&braces) {
         return None;
     }
-    if sort_key.starts_with("_") {
+    if sort_key.starts_with('_') {
         // A block starting with '_' in Rust should be sorted last
         // (it's probably the fallback case in a match)
         unsafe {
@@ -130,7 +130,7 @@ pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
         }
     }
     Some(Balanced {
-        is_annotation: sort_key.starts_with("#"),
+        is_annotation: sort_key.starts_with('#'),
         sort_key,
         last_significant_char,
         language: Language::Rust,
@@ -172,13 +172,9 @@ fn test_check_balanced_rust_not_balanced_until_end() {
         for (i, line) in lines.iter().enumerate() {
             code.push_str(line);
             dbg!(check_balanced_rust(&code));
-            let balanced = check_balanced_rust(&code)
-                .filter(|b| b.last_significant_char.is_some());
-            assert!(
-                balanced.is_none(),
-                "line {} shouldn't balance",
-                i
-            );
+            let balanced =
+                check_balanced_rust(&code).filter(|b| b.last_significant_char.is_some());
+            assert!(balanced.is_none(), "line {} shouldn't balance", i);
         }
         code.push_str(last_line);
         assert!(

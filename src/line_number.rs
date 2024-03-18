@@ -67,16 +67,13 @@ impl std::fmt::Display for LineNumber {
     }
 }
 
-
 /// A macro to create a `LineNumber` from a literal, assuming that since it's
 /// a literal you're calling it with a strictly positive integer.
 #[macro_export]
 macro_rules! line_number {
     ($n:literal) => {
         LineNumber {
-            number: unsafe {
-                std::num::NonZeroUsize::new_unchecked($n)
-            }
+            number: unsafe { std::num::NonZeroUsize::new_unchecked($n) },
         }
     };
 }

@@ -1,6 +1,4 @@
-use {
-    crate::*,
-};
+use crate::*;
 
 /// A piece of code made of complete lines, with balanced braces
 /// and some significant content
@@ -20,4 +18,3 @@ impl Balanced {
         self.last_significant_char.is_none()
     }
 }
-

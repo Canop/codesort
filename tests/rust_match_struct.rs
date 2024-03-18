@@ -74,6 +74,6 @@ fn test_match_struct() {
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 17);
     let mut output = String::new();
-    write!(output, "{}", window.sort()).unwrap();
+    write!(output, "{}", window.sort().unwrap()).unwrap();
     assert_eq!(output, OUTPUT);
 }

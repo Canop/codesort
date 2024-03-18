@@ -46,7 +46,7 @@ fn test_enum_variants_simple_with_spaces() {
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 11);
     let mut output = String::new();
-    write!(output, "{}", window.sort()).unwrap();
+    write!(output, "{}", window.sort().unwrap()).unwrap();
     println!("{}", output);
     assert_eq!(output, OUTPUT);
 }
@@ -84,14 +84,14 @@ fn test_enum_variants_simple_without_space() {
     let list: List = INPUT.parse().unwrap();
     let window = list.window_around(6).unwrap();
 
-    let blocks = window.blocks();
+    let blocks = window.blocks().unwrap();
     tprintln!("blocks:");
     for block in blocks {
         tprint!("\n------\n{}", block.content());
     }
 
     let mut output = String::new();
-    write!(output, "{}", window.sort()).unwrap();
+    write!(output, "{}", window.sort().unwrap()).unwrap();
     println!("{}", output);
     assert_eq!(output, OUTPUT);
 }

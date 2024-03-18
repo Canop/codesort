@@ -20,7 +20,7 @@ impl Window {
     pub fn range(&self) -> std::ops::Range<usize> {
         self.start..self.end
     }
-    pub fn blocks(&self) -> Vec<Block> {
+    pub fn blocks(&self) -> CsResult<Vec<Block>> {
         let mut blocks = Vec::new();
         let mut current_block = None;
         for line_idx in self.start..self.end {
@@ -39,30 +39,34 @@ impl Window {
             }
         }
         if let Some(block) = current_block {
+            if !block.is_balanced() {
+                return Err(CsError::RangeNotSortable);
+            }
             blocks.push(block);
         }
         // before returning, we merge annotation blocks
         let mut merged_blocks: Vec<Block> = Vec::new();
         for mut block in blocks.drain(..) {
-            if merged_blocks.last().map_or(false, |last| last.is_annotation()) {
+            if merged_blocks
+                .last()
+                .map_or(false, |last| last.is_annotation())
+            {
                 let last = merged_blocks.pop().unwrap();
                 block.start = last.start;
                 block.code = last.code + &block.code;
             }
             merged_blocks.push(block);
         }
-        merged_blocks
+        Ok(merged_blocks)
     }
     pub fn sort_blocks(
         &self,
         blocks: &mut [Block],
     ) {
-        blocks.sort_by(|a, b| {
-            a.sort_key().cmp(b.sort_key())
-        });
+        blocks.sort_by(|a, b| a.sort_key().cmp(b.sort_key()));
     }
-    pub fn sort(self) -> List {
-        let mut blocks = self.blocks();
+    pub fn sort(self) -> CsResult<List> {
+        let mut blocks = self.blocks()?;
         self.sort_blocks(&mut blocks);
         let mut src_lines: Vec<_> = self.list.lines.into_iter().map(Some).collect();
         let mut lines = Vec::with_capacity(src_lines.len());
@@ -77,6 +81,6 @@ impl Window {
         for line in &mut src_lines[self.end..] {
             lines.push(line.take().unwrap());
         }
-        List { lines }
+        Ok(List { lines })
     }
 }

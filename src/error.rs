@@ -17,6 +17,9 @@ pub enum CsError {
 
     #[error("You can't specify both --around and --range")]
     RangeAndAround,
+
+    #[error("Provided range is not sortable")]
+    RangeNotSortable,
 }
 
 pub type CsResult<T> = std::result::Result<T, CsError>;

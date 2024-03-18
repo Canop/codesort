@@ -239,7 +239,7 @@ fn test_trait_functions() {
     assert!(list.lines[12].starts_with("fn"));
     let window = list.window_around(12).unwrap();
     let mut output = String::new();
-    write!(output, "{}", window.sort()).unwrap();
+    write!(output, "{}", window.sort().unwrap()).unwrap();
     println!("{}", output);
     assert_eq!(output, OUTPUT);
 }

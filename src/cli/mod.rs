@@ -51,14 +51,14 @@ pub fn run() -> CsResult<()> {
     // Sort
     #[cfg(feature = "explain")]
     {
-        let mut blocks = window.blocks();
+        let mut blocks = window.blocks()?;
         window.sort_blocks(&mut blocks);
         tprintln!("blocks:");
         for block in blocks {
             tprintln!("\n------\n{}", block.content());
         }
     }
-    let sorted_list = window.sort();
+    let sorted_list = window.sort()?;
 
     // Write output
     if let Some(dst) = dst {

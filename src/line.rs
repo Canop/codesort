@@ -1,7 +1,4 @@
-use {
-    crate::*,
-    std::fmt,
-};
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Line {
@@ -28,10 +25,7 @@ impl Line {
             .iter()
             .take_while(|&&b| b == b' ' || b == b'\t')
             .count();
-        Line {
-            content,
-            indent,
-        }
+        Line { content, indent }
     }
     pub fn content(&self) -> &str {
         &self.content

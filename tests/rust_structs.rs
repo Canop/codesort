@@ -64,6 +64,6 @@ fn test_match_struct() {
     let list: List = INPUT.parse().unwrap();
     let window = list.into_window();
     let mut output = String::new();
-    write!(&mut output, "{}", window.sort()).unwrap();
+    write!(&mut output, "{}", window.sort().unwrap()).unwrap();
     assert_eq!(output, OUTPUT);
 }
