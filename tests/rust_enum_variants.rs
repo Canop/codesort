@@ -41,7 +41,7 @@ fn test_enum_variants_simple_with_spaces() {
     }
     "#;
 
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     let window = list.window_around(6).unwrap();
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 11);
@@ -81,7 +81,7 @@ fn test_enum_variants_simple_without_space() {
     }
     "#;
 
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     let window = list.window_around(6).unwrap();
 
     let blocks = window.blocks().unwrap();

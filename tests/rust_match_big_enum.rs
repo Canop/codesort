@@ -161,7 +161,7 @@ static OUTPUT: &str = r#"
 
 #[test]
 fn test_match_big_enum() {
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     println!("{}", list.lines[7]);
     assert!(list.lines[7].starts_with("Internal"));
     let window = list.window_around(7).unwrap();

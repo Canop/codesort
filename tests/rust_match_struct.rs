@@ -67,7 +67,7 @@ pub fn on_event(
 
 #[test]
 fn test_match_struct() {
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     println!("{}", list.lines[17].content());
     assert!(list.lines[17].starts_with("TimedEvent {"));
     let window = list.window_around(17).unwrap();

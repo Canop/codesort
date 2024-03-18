@@ -17,7 +17,7 @@ impl Block {
     ) -> Self {
         let line = &list.lines[start];
         let code = line.content().to_string();
-        let balanced = Balanced::new(&code);
+        let balanced = list.lang.check_balanced(&code);
         Self {
             code,
             balanced,
@@ -41,7 +41,7 @@ impl Block {
     ) {
         let line = &list.lines[self.end];
         self.code.push_str(line.content());
-        self.balanced = Balanced::new(&self.code);
+        self.balanced = list.lang.check_balanced(&self.code);
         self.end += 1;
     }
     pub fn is_balanced(&self) -> bool {

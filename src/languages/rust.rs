@@ -5,10 +5,7 @@ use {
 
 /// Return a Balanced if the given code is balanced according to
 /// Rust syntax.
-///
-/// rust attributes (i.e. `#[...]`) are not tested because they
-/// should be balanced anyway
-pub fn check_balanced_rust(s: &str) -> Option<Balanced> {
+pub fn check_balanced(s: &str) -> Option<Balanced> {
     let bytes = s.as_bytes();
     let mut sort_key = String::new();
     let mut braces = Vec::new();
@@ -171,16 +168,13 @@ fn test_check_balanced_rust_not_balanced_until_end() {
         let last_line = lines.pop().unwrap();
         for (i, line) in lines.iter().enumerate() {
             code.push_str(line);
-            dbg!(check_balanced_rust(&code));
+            dbg!(check_balanced(&code));
             let balanced =
-                check_balanced_rust(&code).filter(|b| b.last_significant_char.is_some());
+                check_balanced(&code).filter(|b| b.last_significant_char.is_some());
             assert!(balanced.is_none(), "line {} shouldn't balance", i);
         }
         code.push_str(last_line);
-        assert!(
-            check_balanced_rust(&code).is_some(),
-            "last line should balance"
-        );
+        assert!(check_balanced(&code).is_some(), "last line should balance");
     }
 }
 
@@ -200,7 +194,7 @@ fn test_check_balanced_rust_ending_in_comma() {
     ];
     for code in test_cases.drain(..) {
         println!("{}", code);
-        let balanced = check_balanced_rust(code).unwrap();
+        let balanced = check_balanced(code).unwrap();
         assert_eq!(balanced.last_significant_char, Some(','));
     }
 }

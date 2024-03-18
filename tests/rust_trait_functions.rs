@@ -235,7 +235,7 @@ pub trait PanelState {
 
 #[test]
 fn test_trait_functions() {
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     assert!(list.lines[12].starts_with("fn"));
     let window = list.window_around(12).unwrap();
     let mut output = String::new();

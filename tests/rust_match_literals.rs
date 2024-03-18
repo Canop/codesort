@@ -45,7 +45,7 @@ fn test_match_literals() {
         }
     "#;
 
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     let window = list.window_around(6).unwrap();
 
     let blocks = window.blocks().unwrap();

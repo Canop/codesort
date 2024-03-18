@@ -1,12 +1,31 @@
+pub mod javascript;
 pub mod rust;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+use {
+    crate::*,
+    std::str::FromStr,
+};
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Language {
-    /// Should also work for C and Java, and maybe others
+    /// Should also work for C, and maybe others
+    #[default]
     Rust,
     JavaScript,
 }
 pub static LANGUAGES: &[Language] = &[Language::Rust, Language::JavaScript];
+
+impl Language {
+    pub fn check_balanced(
+        &self,
+        s: &str,
+    ) -> Option<Balanced> {
+        match self {
+            Language::Rust => rust::check_balanced(s),
+            Language::JavaScript => javascript::check_balanced(s),
+        }
+    }
+}
 
 fn char_is_brace(c: u8) -> bool {
     match c {
@@ -39,4 +58,15 @@ fn braces_are_balanced(braces: &[u8]) -> bool {
         }
     }
     stack.is_empty()
+}
+
+impl FromStr for Language {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "rust" => Ok(Language::Rust),
+            "javascript" | "js" => Ok(Language::JavaScript),
+            _ => Err(format!("unknown language: {}", s)),
+        }
+    }
 }

@@ -61,7 +61,7 @@ pub struct PanelCmdContext<'c> {
 
 #[test]
 fn test_match_struct() {
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     let window = list.into_window();
     let mut output = String::new();
     write!(&mut output, "{}", window.sort().unwrap()).unwrap();

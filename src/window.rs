@@ -66,6 +66,7 @@ impl Window {
         blocks.sort_by(|a, b| a.sort_key().cmp(b.sort_key()));
     }
     pub fn sort(self) -> CsResult<List> {
+        let lang = self.list.lang;
         let mut blocks = self.blocks()?;
         self.sort_blocks(&mut blocks);
         let mut src_lines: Vec<_> = self.list.lines.into_iter().map(Some).collect();
@@ -81,6 +82,6 @@ impl Window {
         for line in &mut src_lines[self.end..] {
             lines.push(line.take().unwrap());
         }
-        Ok(List { lines })
+        Ok(List { lines, lang })
     }
 }

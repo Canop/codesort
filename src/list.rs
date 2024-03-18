@@ -1,29 +1,26 @@
 use {
     crate::*,
-    std::{
-        fmt,
-        str::FromStr,
-    },
+    std::fmt,
 };
 
 /// A text, as a list of lines
 #[derive(Debug, Clone)]
 pub struct List {
     pub lines: Vec<Line>,
-}
-
-impl FromStr for List {
-    type Err = CsError;
-    fn from_str(s: &str) -> CsResult<Self> {
-        Self::from_reader(s.as_bytes())
-    }
+    pub lang: Language,
 }
 
 impl List {
-    pub fn from_bytes(bytes: &[u8]) -> CsResult<Self> {
-        Self::from_reader(bytes)
+    pub fn from_bytes(
+        bytes: &[u8],
+        lang: Language,
+    ) -> CsResult<Self> {
+        Self::from_reader(bytes, lang)
     }
-    pub fn from_reader<R: std::io::BufRead>(mut reader: R) -> CsResult<Self> {
+    pub fn from_reader<R: std::io::BufRead>(
+        mut reader: R,
+        lang: Language,
+    ) -> CsResult<Self> {
         let mut lines = Vec::new();
         loop {
             let mut content = String::new();
@@ -33,7 +30,13 @@ impl List {
             }
             lines.push(Line::from(content));
         }
-        Ok(List { lines })
+        Ok(List { lines, lang })
+    }
+    pub fn from_str(
+        s: &str,
+        lang: Language,
+    ) -> CsResult<Self> {
+        Self::from_reader(s.as_bytes(), lang)
     }
     pub fn line_by_number(
         &self,

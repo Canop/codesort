@@ -53,7 +53,7 @@ fn test_match_enum() {
         }
     }
     "#;
-    let list: List = INPUT.parse().unwrap();
+    let list = List::from_str(INPUT, Language::Rust).unwrap();
     let window = list.window_around(7).unwrap();
     let mut output = String::new();
     write!(output, "{}", window.sort().unwrap()).unwrap();

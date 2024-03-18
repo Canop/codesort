@@ -18,16 +18,17 @@ pub fn run() -> CsResult<()> {
     let args = Args::parse();
     let src = args.src.as_ref().or(args.file.as_ref());
     let dst = args.dst.as_ref().or(args.file.as_ref());
+    let lang = args.lang.unwrap_or_default();
 
     // Read input
     let list = if let Some(src) = src {
         let file = fs::File::open(src)?;
         let reader = BufReader::new(file);
-        List::from_reader(reader)?
+        List::from_reader(reader, lang)?
     } else {
         let stdin = std::io::stdin();
         let reader = stdin.lock();
-        List::from_reader(reader)?
+        List::from_reader(reader, lang)?
     };
 
     // Determine the window to sort

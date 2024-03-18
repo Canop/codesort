@@ -11,9 +11,6 @@ pub struct Balanced {
 }
 
 impl Balanced {
-    pub fn new(code: &str) -> Option<Self> {
-        languages::rust::check_balanced_rust(code)
-    }
     pub fn is_empty(&self) -> bool {
         self.last_significant_char.is_none()
     }
