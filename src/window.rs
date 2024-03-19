@@ -1,13 +1,17 @@
 use crate::*;
 
-/// Line indices are 0-based.
+/// A line list, with the focus added to a specific area
+///  which can be sorted.
+///
+/// Building a window with inconsistent (start, end) will
+///  lead to panics. Prefer to use the List functions.
 pub struct Window {
     /// The lines of the complete file
     pub list: List,
-    /// index in the list of the first line of the winow
-    pub start: usize,
+    /// index in the list of the first line of the window
+    pub start: LineIndex,
     /// index of the first not included line, end >= start
-    pub end: usize,
+    pub end: LineIndex,
 }
 
 impl Window {
@@ -20,6 +24,8 @@ impl Window {
     pub fn range(&self) -> std::ops::Range<usize> {
         self.start..self.end
     }
+    /// Extract consistent blocks from the window. Each
+    ///  block is a contiguous sequence of lines
     pub fn blocks(&self) -> CsResult<Vec<Block>> {
         let mut blocks = Vec::new();
         let mut current_block = None;

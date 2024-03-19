@@ -9,12 +9,12 @@ use {
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Language {
-    /// Should also work for C, and maybe others
+    /// Should also work for C, Zig, and probably some other ones
     #[default]
     Rust,
     /// It should work, but I didn't do much Java in recent years
     Java,
-    /// No idea whethe it works for TypeScript
+    /// Should also work for TypeScript
     JavaScript,
 }
 

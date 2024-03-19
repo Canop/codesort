@@ -27,7 +27,7 @@ Sorting code manually is a tedious and boring task.
 
 ## Usage
 
-## Integrate code-sort in your code editor
+## Code Editor Integration
 
 By default, **code-sort** takes the code to sort from stdin and writes the sorted code to stdout.
 

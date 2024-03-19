@@ -361,12 +361,6 @@ fn test_javascript_assigns() {
     };
     let window = list.window_on_line_range(range).unwrap();
 
-    let blocks = window.blocks().unwrap();
-    tprintln!("blocks:");
-    for block in blocks {
-        tprintln!("\n------\n{}", block.content());
-    }
-
     let mut output = String::new();
     write!(output, "{}", window.sort().unwrap()).unwrap();
     println!("{}", output);

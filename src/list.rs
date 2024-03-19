@@ -3,7 +3,7 @@ use {
     std::fmt,
 };
 
-/// A text, as a list of lines
+/// A text, as a list of lines, most often representing a file
 #[derive(Debug, Clone)]
 pub struct List {
     pub lines: Vec<Line>,
@@ -46,30 +46,30 @@ impl List {
             .get(line_number.to_index())
             .map(|line| line.content())
     }
-    fn has_not_empty_line_at(
-        &self,
-        line_idx: usize,
-    ) -> bool {
-        line_idx < self.lines.len() && !self.lines[line_idx].is_empty()
-    }
     pub fn non_empty_line_around(
         &self,
         line_idx: LineIndex,
     ) -> Option<usize> {
-        if self.has_not_empty_line_at(line_idx) {
+        if !self.lines[line_idx].is_empty() {
             return Some(line_idx);
         }
-        if self.has_not_empty_line_at(line_idx + 1) {
-            return Some(line_idx);
-        }
-        if self.has_not_empty_line_at(line_idx - 1) {
-            return Some(line_idx);
-        }
-        if self.has_not_empty_line_at(line_idx + 2) {
-            return Some(line_idx);
-        }
-        if self.has_not_empty_line_at(line_idx - 2) {
-            return Some(line_idx);
+        for i in 1..3 {
+            let before = Some(line_idx - i)
+                .filter(|&i| i < self.lines.len() && !self.lines[i].is_empty());
+            let after = Some(line_idx + i)
+                .filter(|&i| i < self.lines.len() && !self.lines[i].is_empty());
+            match (before, after) {
+                (Some(a), Some(b)) => {
+                    if self.lines[a].indent() > self.lines[b].indent() {
+                        return Some(a);
+                    } else {
+                        return Some(b);
+                    }
+                }
+                (Some(i), _) => return Some(i),
+                (_, Some(i)) => return Some(i),
+                _ => {}
+            }
         }
         None
     }
@@ -141,7 +141,7 @@ impl List {
     }
     pub fn first_not_empty_line_after(
         &self,
-        line_idx: usize,
+        line_idx: LineIndex,
     ) -> Option<usize> {
         for i in line_idx + 1..self.lines.len() {
             if !self.lines[i].is_empty() {

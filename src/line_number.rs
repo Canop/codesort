@@ -10,6 +10,10 @@ use {
 };
 
 /// A 1-based line number, as used in most text editors
+///
+/// This is used for exchanging with the user, and for most
+/// APIs. Disambiguation is done by using either `LineNumber`
+/// or `LineIndex`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LineNumber {
     pub number: NonZeroUsize,

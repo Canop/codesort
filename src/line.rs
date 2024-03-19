@@ -1,7 +1,9 @@
 use std::fmt;
 
+/// A line in a text file
 #[derive(Debug, Clone)]
 pub struct Line {
+    /// The whole content, including leading spaces and the closing newline
     content: String,
     /// Number of bytes of leading spaces and tabs
     indent: usize,

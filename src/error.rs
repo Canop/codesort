@@ -3,6 +3,9 @@ use crate::*;
 /// An error in code-sort
 #[derive(thiserror::Error, Debug)]
 pub enum CsError {
+    #[error("You can't specify both --around and --range")]
+    RangeAndAround,
+
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
@@ -12,11 +15,8 @@ pub enum CsError {
     #[error("No sortable range found around line number {}", .0+1)]
     NoSortableRangeAround(LineIndex),
 
-    #[error("Invalid range {start}..{end} (0-based)")]
-    InvalidRange { start: usize, end: usize },
-
-    #[error("You can't specify both --around and --range")]
-    RangeAndAround,
+    #[error("Invalid range {}..{}", .start+1, .end+1)]
+    InvalidRange { start: LineIndex, end: LineIndex },
 
     #[error("Provided range is not sortable")]
     RangeNotSortable,

@@ -1,18 +1,21 @@
 use crate::*;
 
-/// a "block" of code, for a given list
+/// A "block" of code, for a given list
+///
+/// Such block may be not complete, it's used as an accumu
+/// during block extraction from a list
 #[derive(Debug, Clone)]
 pub struct Block {
     pub code: String,
     pub balanced: Option<Balanced>,
-    pub start: usize,
-    pub end: usize, // index of the first line not included
+    pub start: LineIndex,
+    pub end: LineIndex, // index of the first line not included
     pub base_indent: usize,
 }
 
 impl Block {
     pub fn new(
-        start: usize,
+        start: LineIndex,
         list: &List,
     ) -> Self {
         let line = &list.lines[start];
