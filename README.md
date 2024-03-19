@@ -12,9 +12,10 @@
 [l4]: https://miaou.dystroy.org/3490?codesort
 
 
-Sometimes, an enum or a struct can become big enough that it's easier to keep track of its content and use, for example `match` arms, when the code is alphabetically sorted.
+Sometimes, when an enum or struct is big, it's easier to sort its parts alphabetically.
+This way you can keep track of `match` arms, for example.
 
-Of course you can't just sort lines if you want the code to keep working and the comments (and annotations, attributes, spacing, etc.) to follow the code.
+Of course you can't just sort lines: the code wouldn't work anymore; comments and annotations would be lost, spacing would be off, etc.
 
 Sorting code manually is a tedious and boring task.
 
