@@ -46,7 +46,7 @@ impl Window {
         }
         if let Some(block) = current_block {
             if !block.is_balanced() {
-                return Err(CsError::RangeNotSortable);
+                return Err(CsError::RangeNotSortable(self.list.lang));
             }
             blocks.push(block);
         }

@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 static INPUT: &str = r#"
     let con = &cc.app.con;
@@ -165,8 +162,5 @@ fn test_match_big_enum() {
     println!("{}", list.lines[7]);
     assert!(list.lines[7].starts_with("Internal"));
     let window = list.window_around(7).unwrap();
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    println!("{}", output);
-    assert_eq!(output, OUTPUT);
+    assert_eq!(window.sort().unwrap().to_string(), OUTPUT,);
 }

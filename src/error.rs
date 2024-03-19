@@ -10,16 +10,16 @@ pub enum CsError {
     Io(#[from] std::io::Error),
 
     #[error("Fmt error: {0}")]
-    Fmt(#[from] std::fmt::Error),
+    Fmt(#[from] std::fmt::Error), // only happens in debug
 
-    #[error("No sortable range found around line number {}", .0+1)]
+    #[error("No sortable range found around line {}", .0+1)]
     NoSortableRangeAround(LineIndex),
 
     #[error("Invalid range {}..{}", .start+1, .end+1)]
     InvalidRange { start: LineIndex, end: LineIndex },
 
-    #[error("Provided range is not sortable")]
-    RangeNotSortable,
+    #[error("Provided range not sortable (lang: {0:?})")]
+    RangeNotSortable(Language),
 }
 
 pub type CsResult<T> = std::result::Result<T, CsError>;

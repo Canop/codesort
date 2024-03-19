@@ -5,10 +5,7 @@ use {
         ValueEnum,
     },
     codesort::*,
-    std::{
-        path::PathBuf,
-        str::FromStr,
-    },
+    std::path::PathBuf,
     termimad::ansi,
 };
 
@@ -56,6 +53,11 @@ pub struct Args {
     #[arg(long)]
     pub dst: Option<PathBuf>,
 
+    /// A path or filename to use only for language detection
+    /// (useful when the content is given with stdin)
+    #[arg(long, value_name = "PATH")]
+    pub detect: Option<PathBuf>,
+
     /// File to sort in place (shortcut for --src and --dst)
     pub file: Option<PathBuf>,
 }
@@ -76,11 +78,12 @@ impl Args {
         match self.lang {
             LangChoice::Rust => Language::Rust,
             LangChoice::Java => Language::Java,
-            LangChoice::Javascript => Language::JavaScript,
+            LangChoice::Js => Language::JavaScript,
             LangChoice::Auto => {
                 let path = self
-                    .src
+                    .detect
                     .as_ref()
+                    .or(self.src.as_ref())
                     .or(self.file.as_ref())
                     .or(self.dst.as_ref());
                 path.and_then(|p| Language::detect(p))
@@ -90,6 +93,7 @@ impl Args {
     }
 }
 
+/// A choice of language at launch
 #[derive(Default, ValueEnum, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LangChoice {
     /// Auto-detect the language from paths (take rust if no path provided)
@@ -99,18 +103,6 @@ pub enum LangChoice {
     Rust,
     /// It should work, but I didn't do much Java in recent years
     Java,
-    /// No idea whethe it works for TypeScript
-    Javascript, // lower 's' so that it's not displayed/parsed as 'java-script'
-}
-impl FromStr for LangChoice {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "auto" => Ok(Self::Auto),
-            "rust" | "rs" => Ok(Self::Rust),
-            "java" => Ok(Self::Java),
-            "javascript" | "js" => Ok(Self::Javascript),
-            _ => Err(format!("unknown language choice: {}", s)),
-        }
-    }
+    /// No idea whether it works for TypeScript
+    Js,
 }

@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 #[test]
 fn test_enum_variants_simple_with_spaces() {
@@ -45,10 +42,7 @@ fn test_enum_variants_simple_with_spaces() {
     let window = list.window_around(6).unwrap();
     dbg!((window.start, window.end));
     assert_eq!(window.len(), 11);
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    println!("{}", output);
-    assert_eq!(output, OUTPUT);
+    assert_eq!(window.sort().unwrap().to_string(), OUTPUT,);
 }
 
 #[test]
@@ -83,8 +77,5 @@ fn test_enum_variants_simple_without_space() {
 
     let list = List::from_str(INPUT, Language::Rust).unwrap();
     let window = list.window_around(6).unwrap();
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    println!("{}", output);
-    assert_eq!(output, OUTPUT);
+    assert_eq!(window.sort().unwrap().to_string(), OUTPUT,);
 }
