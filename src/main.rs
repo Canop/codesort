@@ -1,5 +1,5 @@
 mod cli;
 
-fn main() -> code_sort::CsResult<()> {
+fn main() -> codesort::CsResult<()> {
     cli::run()
 }

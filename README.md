@@ -2,14 +2,14 @@
 
 [![AGPL][s2]][l2] [![Latest Version][s1]][l1] [![Chat on Miaou][s4]][l4]
 
-[s1]: https://img.shields.io/crates/v/code-sort.svg
-[l1]: https://crates.io/crates/code-sort
+[s1]: https://img.shields.io/crates/v/codesort.svg
+[l1]: https://crates.io/crates/codesort
 
 [s2]: https://img.shields.io/badge/license-AGPL-blue.svg
 [l2]: LICENSE
 
 [s4]: https://miaou.dystroy.org/static/shields/room.svg
-[l4]: https://miaou.dystroy.org/3490?code-sort
+[l4]: https://miaou.dystroy.org/3490?codesort
 
 
 Sometimes, an enum or a struct can become big enough that it's easier to keep track of its use, for example `match` arms, when the code is alphabetically sorted.
@@ -18,50 +18,50 @@ Of course you can't just sort lines if you want the code to keep working and the
 
 Sorting code manually is a tedious and boring task.
 
-**code-sort** can sort struct fields, struct variants, enum variants, type declarations, match/switch arms of any kind, function declarations, etc.
+**codesort** can sort struct fields, struct variants, enum variants, type declarations, match/switch arms of any kind, function declarations, etc.
 
 ## Example
 
 
-## Install code-sort
+## Install codesort
 
 ## Usage
 
 ## Code Editor Integration
 
-By default, **code-sort** takes the code to sort from stdin and writes the sorted code to stdout.
+By default, **codesort** takes the code to sort from stdin and writes the sorted code to stdout.
 
 It can sort either the whole input, a given range (with `--range`), or select the best range around a given line (using `--around`).
 
 You can also change the input and output to be files, with `--src` and `--dst`.
 
-Those options make it easy to integrate code-sort in any editor. See below for vim.
+Those options make it easy to integrate codesort in any editor. See below for vim.
 
-## Use code-sort in vim
+## Use codesort in vim
 
 #### Sort the selection
 
 When you don't want to sort the whole range (for example because there's a specific entry that you want to keep at the beginning), you can specify the range.
 
-Visually select the selection, then type `:`, then `!code-sort`.
+Visually select the selection, then type `:`, then `!codesort`.
 This changes the input to
 
 ```
-:'<,'>!code-sort
+:'<,'>!codesort
 ```
 
-Press the `enter` key: the selection is sorted with code-sort.
+Press the `enter` key: the selection is sorted with codesort.
 
 #### Add a binding to sort around the current line
 
 You don't usually have to select the zone to sort.
-You can ask code-sort to automatically select the zone to sort around your current line.
+You can ask codesort to automatically select the zone to sort around your current line.
 
 Define this binding in your vim configuration:
 
 ```
 " sort the optimal range around the current line
-nnoremap <Leader>cs ma<ESC>:execute ":%!code-sort --around ".line('.')<CR>`a
+nnoremap <Leader>cs ma<ESC>:execute ":%!codesort --around ".line('.')<CR>`a
 ```
 
 Typing the leader key then 'cs' will automatically select the set of blocs around the current line and sort it.
@@ -84,6 +84,6 @@ Contributions for other languages would be welcome.
 
 ## Licence
 
-**code-sort** is licenced under [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html).
+**codesort** is licenced under [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html).
 
-You're free to use the **code-sort** program to sort the code of your choice, even commercial.
+You're free to use the **codesort** program to sort the code of your choice, even commercial.

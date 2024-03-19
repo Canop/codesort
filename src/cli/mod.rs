@@ -3,7 +3,7 @@ mod args;
 use {
     args::*,
     clap::Parser,
-    code_sort::*,
+    codesort::*,
     std::{
         fs,
         io::{
@@ -23,7 +23,7 @@ pub fn run() -> CsResult<()> {
     }
 
     if args.version {
-        println!("code-sort {}", env!("CARGO_PKG_VERSION"));
+        println!("codesort {}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
 

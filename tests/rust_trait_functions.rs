@@ -1,5 +1,5 @@
 use {
-    code_sort::*,
+    codesort::*,
     std::fmt::Write,
 };
 

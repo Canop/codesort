@@ -4,7 +4,7 @@ use {
         Parser,
         ValueEnum,
     },
-    code_sort::*,
+    codesort::*,
     std::{
         path::PathBuf,
         str::FromStr,
@@ -13,10 +13,9 @@ use {
 };
 
 static INTRO: &str = "
+**codesort** sorts code.
 
-**code-sort** sorts code.
-
-Source & documentation at https://github.com/Canop/code-sort
+Source & documentation at https://github.com/Canop/codesort
 ";
 
 /// Launch arguments
@@ -38,7 +37,7 @@ pub struct Args {
     pub version: bool,
 
     /// Sort the block around this 1-based line number
-    #[arg(long)]
+    #[arg(long, value_name = "LINE")]
     pub around: Option<LineNumber>,
 
     /// Sort this `start:end` range of 1 based lines, both ends included
@@ -58,7 +57,6 @@ pub struct Args {
     pub dst: Option<PathBuf>,
 
     /// File to sort in place (shortcut for --src and --dst)
-    #[arg(short, long)]
     pub file: Option<PathBuf>,
 }
 
