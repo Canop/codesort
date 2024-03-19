@@ -1,11 +1,15 @@
 [package]
 name = "codesort"
+version = "0.1.0"
 authors = ["dystroy <denys.seguret@gmail.com>"]
 repository = "https://github.com/Canop/codesort"
-version = "0.1.0"
 edition = "2021"
 license = "AGPL-3.0"
 rust-version = "1.65"
+keywords = ["code", "sort"]
+description = "codesort sorts code"
+categories = ["command-line-utilities", "development-tools"]
+readme = "README.md"
 
 [features]
 default = []
