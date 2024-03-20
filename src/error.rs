@@ -20,6 +20,9 @@ pub enum CsError {
 
     #[error("Provided range not sortable (lang: {0:?})")]
     RangeNotSortable(Language),
+
+    #[error("Provided input not balanced")]
+    InputNotBalanced,
 }
 
 pub type CsResult<T> = std::result::Result<T, CsError>;

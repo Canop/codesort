@@ -44,6 +44,7 @@
 //! );
 //! ```
 
+mod analyzers;
 mod balanced;
 mod block;
 mod error;
@@ -55,6 +56,7 @@ mod tprint;
 mod window;
 
 pub use {
+    analyzers::*,
     balanced::*,
     block::*,
     error::*,

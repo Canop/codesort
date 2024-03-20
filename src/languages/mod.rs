@@ -7,6 +7,7 @@ use {
     std::path::Path,
 };
 
+
 /// The language syntax to use for analyzing the code
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Language {
