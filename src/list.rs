@@ -46,7 +46,7 @@ impl List {
             .get(line_number.to_index())
             .map(|line| line.content())
     }
-    pub fn non_empty_line_around(
+    fn non_empty_line_around(
         &self,
         line_idx: LineIndex,
     ) -> Option<usize> {
@@ -138,17 +138,6 @@ impl List {
             start: 0,
             end,
         }
-    }
-    pub fn first_not_empty_line_after(
-        &self,
-        line_idx: LineIndex,
-    ) -> Option<usize> {
-        for i in line_idx + 1..self.lines.len() {
-            if !self.lines[i].is_empty() {
-                return Some(i);
-            }
-        }
-        None
     }
     /// Print the lines, for debug
     pub fn tprint(&self) {

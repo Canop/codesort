@@ -6,15 +6,12 @@
 //! use codesort::{List, Language};
 //! let input = r#"
 //! pub enum ContentSearchResult {
-//!
 //!     /// the file wasn't searched because it's binary or too big
 //!     NotSuitable,
-//!
 //!     /// the needle has been found at the given pos
 //!     Found {
 //!         pos: usize,
 //!     },
-//!
 //!     /// the needle hasn't been found
 //!     NotFound, // no match
 //! }
@@ -22,22 +19,19 @@
 //!
 //! let output = r#"
 //! pub enum ContentSearchResult {
-//!
 //!     /// the needle has been found at the given pos
 //!     Found {
 //!         pos: usize,
 //!     },
-//!
 //!     /// the needle hasn't been found
 //!     NotFound, // no match
-//!
 //!     /// the file wasn't searched because it's binary or too big
 //!     NotSuitable,
 //! }
 //! "#;
 //!
 //! let list = List::from_str(input, Language::Rust).unwrap();
-//! let window = list.window_around(6).unwrap();
+//! let window = list.window_around(5).unwrap();
 //! assert_eq!(
 //!     window.sort().unwrap().to_string(),
 //!     output,

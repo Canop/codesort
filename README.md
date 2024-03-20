@@ -1,4 +1,4 @@
-## Code-Sort
+## CodeSort
 
 [![AGPL][s2]][l2] [![Latest Version][s1]][l1] [![Chat on Miaou][s4]][l4]
 
@@ -12,24 +12,21 @@
 [l4]: https://miaou.dystroy.org/3490?codesort
 
 
-Sometimes, when an enum or struct is big, it's easier to sort its parts alphabetically.
-This way you can keep track of `match` arms, for example.
+Your code is full of lists: enum variants, struct fields, match arms, function declarations, etc.
+
+When they grow, it's sometimes useful to sort them alphabetically, to help you keep track of the parts.
 
 Of course you can't just sort lines: the code wouldn't work anymore; comments and annotations would be lost, spacing would be off, etc.
 
-Sorting code manually is a tedious and boring task.
+And sorting code manually is a tedious task.
 
-**codesort** can sort struct fields, struct variants, enum variants, type declarations, match/switch arms of any kind, function declarations, etc.
+**codesort** can do it for you, directly in your IDE.
 
 Here's the before and after of sorting around the cursor's line:
 
 ![errors](doc/errors.png)
 
 ## Examples
-
-<details><summary>Sort the arms of a huge rust <code>match</code></summary>
-<img src=doc/on_internal.png>
-</details>
 
 <details><summary>Sort the variants of a rust enum</summary>
 <img src=doc/cmd_result.png>
@@ -44,6 +41,9 @@ Here's the before and after of sorting around the cursor's line:
 <i>Here, the range to sort has been visually selected.</i>
 </details>
 
+<details><summary>Sort the arms of a huge rust <code>match</code></summary>
+<img src=doc/on_internal.png>
+</details>
 
 ## Install codesort
 
@@ -55,11 +55,24 @@ cargo install codesort
 
 ## Usage
 
-#### Sort around a line
+#### Sort a range in a file
 
 ```
-codesort --around 25 src/my/file.rs
+codesort --range 84:56 src/my/file.rs
 ```
+
+#### Sort around a line
+
+Unless you specifically want to exclude a part of the list from sorting (eg a field you want to keep at the end of a struct), you should prefer to use `--around` which selects the range for you.
+
+The first example of this readme has been sorted with the following command:
+
+```
+codesort --around 14 src/my/file.rs
+```
+
+Any other line number from `6` to `26` would have been fine, except the deeper lines `21` and `22`
+(if you sort around line `22`, you sort `start` and `end`, which is probably not desired).
 
 #### Sort from stdin, return to stdout
 
@@ -124,7 +137,7 @@ Explanation of the command:
 
 3 code analyzers are available now:
 
-* Rust, which should work for Zig and C too
+* Rust / C / Zig
 * Java
 * JavaScript
 
