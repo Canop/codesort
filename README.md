@@ -143,6 +143,8 @@ Explanation of the command:
 
 If you want to use codesort in another language, ask or contribute.
 
+Note: while codesort is much tested on Rust, I'd welcome feedback regarding other languages.
+
 ## Licence
 
 **codesort** is licenced under [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html).

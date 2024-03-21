@@ -10,6 +10,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
     let mut sort_key = String::new();
     let mut braces = Vec::new();
     let mut last_is_antislash = false;
+    let mut last_is_quote = false;
     let mut iter = bytes.iter().enumerate();
     let mut last_significant_char = None;
     loop {
@@ -17,7 +18,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
             break;
         };
         match c {
-            b'"' if !last_is_antislash => {
+            b'"' if !last_is_antislash && !last_is_quote => {
                 // let's count the `#` before and determine whether it's
                 // a raw string or not
                 let mut sharp_count = 0;
@@ -59,7 +60,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
                     }
                 }
             }
-            b'/' if !last_is_antislash => {
+            b'/' if !last_is_antislash && !last_is_quote => {
                 if i + 1 < bytes.len() && bytes[i + 1] == b'/' {
                     // it's a line comment
                     loop {
@@ -88,26 +89,24 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
                     }
                 }
             }
-            c if char_is_brace(c) && !last_is_antislash => {
-                if bytes[i - 1] == b'\'' && i + 1 < bytes.len() && bytes[i + 1] == b'\'' {
-                    // it's a char literal
-                } else {
-                    braces.push(c);
-                }
+            c if char_is_brace(c) && !last_is_antislash && !last_is_quote => {
+                braces.push(c);
                 last_significant_char = Some(c);
                 sort_key.push(c as char);
             }
-            b' ' | b'\t' | b'\n' | b'\r' if !last_is_antislash => {
+            b' ' | b'\t' | b'\n' | b'\r' if !last_is_antislash && !last_is_quote => {
                 // ignore
             }
             b'\\' if !last_is_antislash => {
                 last_significant_char = Some(c);
                 last_is_antislash = true;
+                last_is_quote = false;
             }
             c => {
                 sort_key.push(c as char);
                 last_significant_char = Some(c);
                 last_is_antislash = false;
+                last_is_quote = c == b'\'';
             }
         }
     }
@@ -139,6 +138,19 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
 #[test]
 fn test_check_balanced_rust_not_balanced_until_end() {
     let mut test_cases = vec![
+        vec![
+r#"let is_double_quote = if c == b'"' {
+"#,
+"    true\n",
+"} else {\n",
+"    false\n",
+"};\n",
+        ],
+        vec![
+            "   SpecialHandlingShortcut::None => SpecialHandling {\n",
+            "       show: Default, list: Default, sum: Default,\n",
+            "   },\n",
+        ],
         vec![
             "   SpecialHandlingShortcut::None => SpecialHandling {\n",
             "       show: Default, list: Default, sum: Default,\n",
