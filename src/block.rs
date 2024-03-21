@@ -64,10 +64,9 @@ impl Block {
     }
     pub fn is_complete(&self) -> bool {
         match self.balanced {
-            Some(ref balanced) => match balanced.last_significant_char {
-                Some(';' | '}' | ',' | ']') => true,
-                _ => false,
-            },
+            Some(ref balanced) => {
+                matches!(balanced.last_significant_char, Some(';' | '}' | ',' | ']'))
+            }
             None => false,
         }
     }

@@ -42,10 +42,7 @@ impl Language {
 }
 
 fn char_is_brace(c: u8) -> bool {
-    match c {
-        b'{' | b'}' | b'[' | b']' | b'(' | b')' => true,
-        _ => false,
-    }
+    matches!(c, b'{' | b'}' | b'[' | b']' | b'(' | b')')
 }
 fn braces_are_balanced(braces: &[u8]) -> bool {
     let len = braces.len();
