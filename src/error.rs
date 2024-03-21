@@ -3,7 +3,6 @@ use crate::*;
 /// An error in codesort
 #[derive(thiserror::Error, Debug)]
 pub enum CsError {
-
     #[error("You can't specify both --around and --range")]
     RangeAndAround,
 

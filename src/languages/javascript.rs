@@ -59,9 +59,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
                 } else if i + 1 < bytes.len() && bytes[i + 1] == b'*' {
                     // it's a block comment
                     loop {
-                        let Some((_, &c)) = iter.next() else {
-                            return None;
-                        };
+                        let (_, &c) = iter.next()?;
                         if c == b'*' {
                             if let Some((_, &c)) = iter.next() {
                                 if c == b'/' {

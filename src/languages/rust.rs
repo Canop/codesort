@@ -74,9 +74,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
                 } else if i + 1 < bytes.len() && bytes[i + 1] == b'*' {
                     // it's a block comment
                     loop {
-                        let Some((_, &c)) = iter.next() else {
-                            return None;
-                        };
+                        let (_, &c) = iter.next()?;
                         if c == b'*' {
                             if let Some((_, &c)) = iter.next() {
                                 if c == b'/' {
@@ -139,12 +137,12 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
 fn test_check_balanced_rust_not_balanced_until_end() {
     let mut test_cases = vec![
         vec![
-r#"let is_double_quote = if c == b'"' {
+            r#"let is_double_quote = if c == b'"' {
 "#,
-"    true\n",
-"} else {\n",
-"    false\n",
-"};\n",
+            "    true\n",
+            "} else {\n",
+            "    false\n",
+            "};\n",
         ],
         vec![
             "   SpecialHandlingShortcut::None => SpecialHandling {\n",
