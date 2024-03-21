@@ -58,7 +58,7 @@ cargo install codesort
 #### Sort a range in a file
 
 ```
-codesort --range 84:56 src/my/file.rs
+codesort --range 6:26 src/my/file.rs
 ```
 
 #### Sort around a line
