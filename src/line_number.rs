@@ -43,12 +43,12 @@ impl FromStr for LineNumberRange {
         let Some((_, start, end)) = regex_captures!(r"^(\d+)[^\d]+(\d+)$", s) else {
             return Err(format!("Invalid line number range: {}", s));
         };
-        if start >= end {
-            return Err(format!("Invalid range: {}", s));
-        }
         let start: LineNumber =
             start.parse().map_err(|e: ParseIntError| e.to_string())?;
         let end: LineNumber = end.parse().map_err(|e: ParseIntError| e.to_string())?;
+        if start.number >= end.number {
+            return Err(format!("Invalid range: {}", s));
+        }
         Ok(LineNumberRange { start, end })
     }
 }
