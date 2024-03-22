@@ -14,7 +14,7 @@
 
 Your code is full of lists: enum variants, struct fields, match arms, function declarations, etc.
 
-When they grow, it's sometimes useful to sort them alphabetically, to help you keep track of the parts.
+When a list grows, it's sometimes useful to sort it alphabetically, to help you keep track of the parts.
 
 Of course you can't just sort lines: the code wouldn't work anymore; comments and annotations would be lost, spacing would be off, etc.
 
