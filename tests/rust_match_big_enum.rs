@@ -158,8 +158,7 @@ static OUTPUT: &str = r#"
 
 #[test]
 fn test_match_big_enum() {
-    let analyzer = RustAnalyzer;
-    let list = analyzer.read_str(INPUT).unwrap();
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");
     let focused = list.focus_around_line_idx(7).unwrap();
     focused.print_debug();

@@ -1,18 +1,4 @@
-use crate::*;
-
-pub trait Analyzer {
-    fn read<R: std::io::BufRead>(
-        &self,
-        reader: R,
-    ) -> CsResult<LocList>;
-
-    fn read_str(
-        &self,
-        s: &str,
-    ) -> CsResult<LocList> {
-        self.read(s.as_bytes())
-    }
-}
+// TODO try to explain how and why this works without sounding too crazy
 
 #[derive(Debug, Clone)]
 pub struct CharSet {
@@ -29,12 +15,14 @@ impl From<Vec<char>> for CharSet {
     }
 }
 
+/// Something that is required by the state of a LOC list
 #[derive(Debug, Clone)]
 pub struct Wish {
     pub any_of: CharSet,
     pub depth: usize,
 }
 
+/// Something that can maybe satisfy a wish
 #[derive(Debug, Clone, Copy)]
 pub struct Gift {
     pub depth: usize,

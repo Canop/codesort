@@ -70,8 +70,7 @@ pub fn on_event(
 
 #[test]
 fn test_match_struct_with_spaces() {
-    let analyzer = RustAnalyzer;
-    let list = analyzer.read_str(INPUT).unwrap();
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");
     let focused = list.focus_around_line_idx(26).unwrap();
     focused.print_debug();

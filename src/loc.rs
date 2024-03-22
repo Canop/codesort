@@ -6,30 +6,45 @@ use {
     },
 };
 
+/// A Line of Code, analyzed.
+///
+/// While public, this is implementation dependant and may change
+/// on patch versions.
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct Loc {
+    /// The whole content of the line, including the ending newline
     pub content: String,
+    /// The key used for sorting, may be empty
     pub sort_key: String,
     /// number of bytes of leading spaces
     pub indent: usize,
+    /// The syntactic depth considered on the whole file, at start of line
     pub start_depth: usize,
+    /// The syntactic depth considered on the whole file, at end of line
     pub end_depth: usize,
+    /// Whether this line starts a java annotation, a rust attribute, etc.
     pub is_annotation: bool,
     pub can_complete: bool,
-    pub wishes: Vec<Wish>, // wishes needed after this loc
-    pub gifts: Vec<Gift>,  // gifts not required by this loc
+    /// wishes needed after this loc
+    pub wishes: Vec<Wish>,
+    /// gifts not required by this loc
+    pub gifts: Vec<Gift>,
 }
 
 impl Loc {
+    /// Either the depth at start, or the depth at end, whichever is smaller
     pub fn min_depth(&self) -> usize {
         self.start_depth.min(self.end_depth)
     }
+    /// Whether the deindented content starts with the given string
     pub fn starts_with(
         &self,
         s: &str,
     ) -> bool {
         self.content.trim_start().starts_with(s)
     }
+    /// the last character which is not a whitespace or part of a comment
     pub fn last_significant_char(&self) -> Option<char> {
         self.sort_key.chars().rev().find(|c| !c.is_whitespace())
     }

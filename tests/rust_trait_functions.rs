@@ -232,8 +232,7 @@ pub trait PanelState {
 
 #[test]
 fn test_trait_functions() {
-    let analyzer = RustAnalyzer;
-    let list = analyzer.read_str(INPUT).unwrap();
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     let focused = list.focus_around_line_idx(12).unwrap();
     focused.print_debug();
     {

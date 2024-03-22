@@ -138,8 +138,7 @@ pub struct Conf {
 
 #[test]
 fn test_struct_fields() {
-    let analyzer = RustAnalyzer;
-    let list = analyzer.read_str(INPUT).unwrap();
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     let focused = list.focus_around_line_idx(5).unwrap();
     focused.print_debug();
     {

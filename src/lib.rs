@@ -38,35 +38,22 @@
 //! );
 //! ```
 
-mod analyzer;
 mod analyzers;
-mod balanced;
-mod block;
 mod brace_stack;
 mod error;
 mod focused;
-mod languages;
-mod line;
+mod gifts;
 mod line_number;
-mod list;
 mod loc;
 mod loc_list;
-mod tprint;
-mod window;
 
 pub use {
-    analyzer::*,
     analyzers::*,
-    balanced::*,
-    block::*,
     brace_stack::*,
     error::*,
     focused::*,
-    languages::*,
-    line::*,
+    gifts::*,
     line_number::*,
-    list::*,
     loc::*,
     loc_list::*,
-    window::*,
 };

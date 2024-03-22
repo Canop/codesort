@@ -76,11 +76,11 @@ impl Args {
     }
     pub fn lang(&self) -> Language {
         match self.lang {
-            LangChoice::C => Language::Rust, // It should be fine
+            LangChoice::C => Language::C,
             LangChoice::Rust => Language::Rust,
-            LangChoice::Zig => Language::Rust, // it's the same, right ?
+            LangChoice::Zig => Language::Zig,
             LangChoice::Java => Language::Java,
-            LangChoice::Js => Language::JavaScript,
+            LangChoice::Js => Language::Javascript,
             LangChoice::Auto => {
                 let path = self
                     .detect
@@ -95,7 +95,7 @@ impl Args {
     }
 }
 
-/// A choice of language at launch
+/// A choice of language
 #[derive(Default, ValueEnum, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LangChoice {
     /// Auto-detect the language from paths (take rust if no path provided)

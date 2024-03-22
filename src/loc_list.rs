@@ -6,12 +6,30 @@ use {
     },
 };
 
+/// A list of Lines of Code
+///
+/// To sort it, you focus it, which specifies the area to sort, then
+/// you call sort it.
 #[derive(Debug, Clone, Default)]
 pub struct LocList {
     pub locs: Vec<Loc>,
 }
 
 impl LocList {
+    pub fn read<R: std::io::BufRead>(
+        reader: R,
+        lang: Language,
+    ) -> CsResult<Self> {
+        lang.analyzer().read(reader)
+    }
+
+    pub fn read_str(
+        s: &str,
+        lang: Language,
+    ) -> CsResult<LocList> {
+        Self::read(s.as_bytes(), lang)
+    }
+
     pub fn focus_all(self) -> CsResult<Focused> {
         Ok(Focused {
             before: LocList::default(),
@@ -48,6 +66,13 @@ impl LocList {
         line_idx: LineIndex,
     ) -> CsResult<Focused> {
         let range = self.range_around_idx(line_idx)?;
+        self.focus(range)
+    }
+    pub fn focus_around_line_number(
+        self,
+        line_number: LineNumber,
+    ) -> CsResult<Focused> {
+        let range = self.range_around_idx(line_number.to_index())?;
         self.focus(range)
     }
     pub fn print_debug(
