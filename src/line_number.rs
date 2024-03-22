@@ -60,6 +60,11 @@ impl LineNumber {
     pub fn to_index(&self) -> LineIndex {
         self.number.get() - 1
     }
+    pub fn from_index(index: LineIndex) -> Self {
+        LineNumber {
+            number: NonZeroUsize::new(index + 1).unwrap(),
+        }
+    }
 }
 
 impl std::fmt::Display for LineNumber {
