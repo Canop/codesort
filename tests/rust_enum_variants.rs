@@ -38,11 +38,20 @@ fn test_enum_variants_simple_with_spaces() {
     }
     "#;
 
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    let window = list.window_around(6).unwrap();
-    dbg!((window.start, window.end));
-    assert_eq!(window.len(), 11);
-    assert_eq!(window.sort().unwrap().to_string(), OUTPUT,);
+    let analyzer = RustAnalyzer;
+    let list = analyzer.read_str(INPUT).unwrap();
+    //list.print_debug(" WHOLE ");
+    let focused = list.focus_around_line_idx(6).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }
 
 #[test]
@@ -75,7 +84,18 @@ fn test_enum_variants_simple_without_space() {
     }
     "#;
 
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    let window = list.window_around(6).unwrap();
-    assert_eq!(window.sort().unwrap().to_string(), OUTPUT,);
+    let analyzer = RustAnalyzer;
+    let list = analyzer.read_str(INPUT).unwrap();
+    //list.print_debug(" WHOLE ");
+    let focused = list.focus_around_line_idx(6).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }

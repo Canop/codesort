@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 #[test]
 fn test_match_literals() {
@@ -45,10 +42,19 @@ fn test_match_literals() {
         }
     "#;
 
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    let window = list.window_around(6).unwrap();
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    println!("{}", output);
-    assert_eq!(output, OUTPUT);
+    let analyzer = RustAnalyzer;
+    let list = analyzer.read_str(INPUT).unwrap();
+    let focused = list.focus_around_line_idx(6).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+        assert!(blocks[1] < blocks[0]);
+        assert!(blocks[3] < blocks[0]);
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }

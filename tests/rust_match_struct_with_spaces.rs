@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 static INPUT: &str = r#"
 pub fn on_event(
@@ -73,13 +70,18 @@ pub fn on_event(
 
 #[test]
 fn test_match_struct_with_spaces() {
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    assert!(list.lines[26].content().contains("// anything else"));
-    let window = list.window_around(26).unwrap();
-    dbg!((window.start, window.end));
-    assert_eq!(window.len(), 20);
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    println!("{}", output);
-    assert_eq!(output, OUTPUT);
+    let analyzer = RustAnalyzer;
+    let list = analyzer.read_str(INPUT).unwrap();
+    //list.print_debug(" WHOLE ");
+    let focused = list.focus_around_line_idx(26).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }

@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 static INPUT: &str = r#"
 /// The configuration read from conf.toml or conf.hjson file(s)
@@ -141,9 +138,17 @@ pub struct Conf {
 
 #[test]
 fn test_struct_fields() {
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    let window = list.window_around(5).unwrap();
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    assert_eq!(output, OUTPUT);
+    let analyzer = RustAnalyzer;
+    let list = analyzer.read_str(INPUT).unwrap();
+    let focused = list.focus_around_line_idx(5).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }
