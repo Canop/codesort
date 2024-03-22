@@ -61,7 +61,7 @@ impl LocList {
             after,
         })
     }
-    pub fn focus_around_line_idx(
+    pub fn focus_around_line_index(
         self,
         line_idx: LineIndex,
     ) -> CsResult<Focused> {

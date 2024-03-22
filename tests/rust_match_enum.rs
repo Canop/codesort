@@ -51,7 +51,7 @@ fn test_match_enum() {
     }
     "#;
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
-    let focused = list.focus_around_line_idx(7).unwrap();
+    let focused = list.focus_around_line_index(7).unwrap();
     let sorted_list = focused.sort();
     assert_eq!(sorted_list.to_string(), OUTPUT);
 }

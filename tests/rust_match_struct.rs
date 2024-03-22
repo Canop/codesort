@@ -65,7 +65,7 @@ pub fn on_event(
 #[test]
 fn test_match_struct() {
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
-    let focused = list.focus_around_line_idx(17).unwrap();
+    let focused = list.focus_around_line_index(17).unwrap();
     focused.print_debug();
     {
         let blocks = focused.clone().focus.into_blocks();

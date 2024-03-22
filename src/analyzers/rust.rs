@@ -129,8 +129,6 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                             sort_key.push(c);
                         }
                     }
-                    last_is_antislash = c == '\\' && !last_is_antislash;
-                    last_is_quote = c == '\'';
                 }
                 State::DoubleQuotedString => {
                     if c == '"' && !last_is_antislash {
@@ -160,6 +158,8 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                     _ => {}
                 },
             }
+            last_is_antislash = c == '\\' && !last_is_antislash;
+            last_is_quote = c == '\'';
         }
         let is_annotation = sort_key.starts_with("#[");
         let last_significant_char = sort_key.chars().rev().find(|c| !c.is_whitespace());

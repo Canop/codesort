@@ -40,7 +40,7 @@ fn test_enum_variants_simple_with_spaces() {
 
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");
-    let focused = list.focus_around_line_idx(6).unwrap();
+    let focused = list.focus_around_line_index(6).unwrap();
     focused.print_debug();
     {
         let blocks = focused.clone().focus.into_blocks();
@@ -85,7 +85,7 @@ fn test_enum_variants_simple_without_space() {
 
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");
-    let focused = list.focus_around_line_idx(6).unwrap();
+    let focused = list.focus_around_line_index(6).unwrap();
     focused.print_debug();
     {
         let blocks = focused.clone().focus.into_blocks();

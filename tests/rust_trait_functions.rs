@@ -233,7 +233,7 @@ pub trait PanelState {
 #[test]
 fn test_trait_functions() {
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
-    let focused = list.focus_around_line_idx(12).unwrap();
+    let focused = list.focus_around_line_index(12).unwrap();
     focused.print_debug();
     {
         let blocks = focused.clone().focus.into_blocks();

@@ -72,7 +72,7 @@ pub fn on_event(
 fn test_match_struct_with_spaces() {
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");
-    let focused = list.focus_around_line_idx(26).unwrap();
+    let focused = list.focus_around_line_index(26).unwrap();
     focused.print_debug();
     {
         let blocks = focused.clone().focus.into_blocks();

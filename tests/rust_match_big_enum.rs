@@ -160,7 +160,7 @@ static OUTPUT: &str = r#"
 fn test_match_big_enum() {
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");
-    let focused = list.focus_around_line_idx(7).unwrap();
+    let focused = list.focus_around_line_index(7).unwrap();
     focused.print_debug();
     {
         let blocks = focused.clone().focus.into_blocks();
