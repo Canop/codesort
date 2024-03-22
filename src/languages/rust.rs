@@ -87,7 +87,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
                     }
                 }
             }
-            c if char_is_brace(c) && !last_is_antislash && !last_is_quote => {
+            c if byte_is_brace(c) && !last_is_antislash && !last_is_quote => {
                 braces.push(c);
                 last_significant_char = Some(c);
                 sort_key.push(c as char);

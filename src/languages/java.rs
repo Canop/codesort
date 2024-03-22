@@ -61,7 +61,7 @@ pub fn check_balanced(s: &str) -> Option<Balanced> {
                     }
                 }
             }
-            c if char_is_brace(c) && !last_is_antislash => {
+            c if byte_is_brace(c) && !last_is_antislash => {
                 if bytes[i - 1] == b'\'' && i + 1 < bytes.len() && bytes[i + 1] == b'\'' {
                     // it's a char literal
                 } else {

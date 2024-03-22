@@ -33,8 +33,6 @@ fn token_wishes(token: &str) -> Vec<CharSet> {
 }
 
 impl Analyzer for RustAnalyzer {
-    // keep track of the byte index of the current line
-
     fn read<R: std::io::BufRead>(
         &self,
         mut reader: R,
@@ -193,13 +191,6 @@ impl Analyzer for RustAnalyzer {
             });
         }
         Ok(LocList { locs })
-    }
-}
-
-fn char_is_brace(c: char) -> bool {
-    match c {
-        '{' | '}' | '[' | ']' | '(' | ')' => true,
-        _ => false,
     }
 }
 

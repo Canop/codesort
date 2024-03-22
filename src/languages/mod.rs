@@ -41,7 +41,7 @@ impl Language {
     }
 }
 
-fn char_is_brace(c: u8) -> bool {
+fn byte_is_brace(c: u8) -> bool {
     match c {
         b'{' | b'}' | b'[' | b']' | b'(' | b')' => true,
         _ => false,

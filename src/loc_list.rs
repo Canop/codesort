@@ -69,14 +69,28 @@ impl LocList {
             .iter()
             .any(|loc| !loc.is_annotation && !loc.sort_key.is_empty())
     }
+    pub fn las_significant_char(&self) -> Option<char> {
+        self.locs
+            .iter()
+            .rev()
+            .find_map(|loc| loc.last_significant_char())
+    }
+    pub fn last_line_with_content(&self) -> Option<&Loc> {
+        self.locs.iter().rev().find(|&loc| loc.is_sortable())
+    }
     pub fn is_complete(&self) -> bool {
         if !self.has_content() {
             return false;
         }
-        let (Some(first), Some(last)) = (self.locs.first(), self.locs.last()) else {
+        let (Some(first), Some(last)) =
+            (self.locs.first(), self.last_line_with_content())
+        else {
             return false;
         };
-        if first.start_depth != last.end_depth || !last.can_complete {
+        if first.start_depth != last.end_depth {
+            return false;
+        }
+        if !last.can_complete {
             return false;
         }
         let mut wished = Vec::new();

@@ -21,6 +21,9 @@ pub enum CsError {
     #[error("Provided range not sortable (lang: {0:?})")]
     RangeNotSortable(Language),
 
+    #[error("Unexpected closing brace: {0}")]
+    UnexpectedClosingBrace(char),
+
     #[error("Provided input not balanced")]
     InputNotBalanced,
 }

@@ -14,17 +14,17 @@ impl BraceStack {
             '(' | '[' | '{' => self.braces.push(brace),
             ')' => {
                 if self.braces.pop() != Some('(') {
-                    return Err(CsError::InputNotBalanced);
+                    return Err(CsError::UnexpectedClosingBrace(brace));
                 }
             }
             ']' => {
                 if self.braces.pop() != Some('[') {
-                    return Err(CsError::InputNotBalanced);
+                    return Err(CsError::UnexpectedClosingBrace(brace));
                 }
             }
             '}' => {
                 if self.braces.pop() != Some('{') {
-                    return Err(CsError::InputNotBalanced);
+                    return Err(CsError::UnexpectedClosingBrace(brace));
                 }
             }
             _ => panic!("unexpected brace: {}", brace),
@@ -33,5 +33,12 @@ impl BraceStack {
     }
     pub fn depth(&self) -> usize {
         self.braces.len()
+    }
+}
+
+pub fn char_is_brace(c: char) -> bool {
+    match c {
+        '{' | '}' | '[' | ']' | '(' | ')' => true,
+        _ => false,
     }
 }
