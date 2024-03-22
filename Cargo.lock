@@ -142,7 +142,7 @@ checksum = "98cc8fbded0c607b7ba9dd60cd98df59af97e84d24e49c8557331cfc26d301ce"
 
 [[package]]
 name = "codesort"
-version = "0.1.0"
+version = "0.1.3"
 dependencies = [
  "clap",
  "clap-help",

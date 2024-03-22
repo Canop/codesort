@@ -76,7 +76,9 @@ impl Args {
     }
     pub fn lang(&self) -> Language {
         match self.lang {
+            LangChoice::C => Language::Rust, // It should be fine
             LangChoice::Rust => Language::Rust,
+            LangChoice::Zig => Language::Rust, // it's the same, right ?
             LangChoice::Java => Language::Java,
             LangChoice::Js => Language::JavaScript,
             LangChoice::Auto => {
@@ -99,10 +101,9 @@ pub enum LangChoice {
     /// Auto-detect the language from paths (take rust if no path provided)
     #[default]
     Auto,
-    /// Should also work for C, and maybe others
-    Rust,
-    /// It should work, but I didn't do much Java in recent years
+    C,
     Java,
-    /// No idea whether it works for TypeScript
     Js,
+    Rust,
+    Zig,
 }

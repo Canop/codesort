@@ -354,10 +354,10 @@ fn test_javascript_assigns() {
     "#;
 
     let list = List::from_str(INPUT, Language::JavaScript).unwrap();
-    //list.tprint();
+    list.tprint();
     let range = LineNumberRange {
-        start: line_number!(9),
-        end: line_number!(171),
+        start: LineNumber::new(9).unwrap(),
+        end: LineNumber::new(171).unwrap(),
     };
     let window = list.window_on_line_range(range).unwrap();
 

@@ -14,7 +14,7 @@ use {
 /// This is used for exchanging with the user, and for most
 /// APIs. Disambiguation is done by using either `LineNumber`
 /// or `LineIndex`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LineNumber {
     pub number: NonZeroUsize,
 }
@@ -43,12 +43,12 @@ impl FromStr for LineNumberRange {
         let Some((_, start, end)) = regex_captures!(r"^(\d+)[^\d]+(\d+)$", s) else {
             return Err(format!("Invalid line number range: {}", s));
         };
-        if start >= end {
-            return Err(format!("Invalid range: {}", s));
-        }
         let start: LineNumber =
             start.parse().map_err(|e: ParseIntError| e.to_string())?;
         let end: LineNumber = end.parse().map_err(|e: ParseIntError| e.to_string())?;
+        if start >= end {
+            return Err(format!("Invalid range: {}", s));
+        }
         Ok(LineNumberRange { start, end })
     }
 }
@@ -74,15 +74,4 @@ impl std::fmt::Display for LineNumber {
     ) -> std::fmt::Result {
         write!(f, "{}", self.number)
     }
-}
-
-/// A macro to create a `LineNumber` from a literal, assuming that since it's
-/// a literal you're calling it with a strictly positive integer.
-#[macro_export]
-macro_rules! line_number {
-    ($n:literal) => {
-        LineNumber {
-            number: unsafe { std::num::NonZeroUsize::new_unchecked($n) },
-        }
-    };
 }
