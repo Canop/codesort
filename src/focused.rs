@@ -16,7 +16,9 @@ impl Focused {
     pub fn sort(self) -> LocList {
         let mut locs = self.before.locs;
         let mut blocks = self.focus.into_blocks();
+        let spacing = Spacing::recognize(&blocks);
         blocks.sort();
+        spacing.apply(&mut blocks);
         for block in blocks {
             locs.extend(block.locs);
         }

@@ -103,7 +103,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                         '\'' if !last_is_antislash => {
                             // A single quote can be either the start of a char literal or
                             // a lifetime. We must find what it is.
-                            let mut next_chars = (&indented[i + 1..]).chars();
+                            let mut next_chars = indented[i + 1..].chars();
                             if let (Some(a), Some(b)) =
                                 (next_chars.next(), next_chars.next())
                             {

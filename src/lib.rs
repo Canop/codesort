@@ -46,6 +46,7 @@ mod gifts;
 mod line_number;
 mod loc;
 mod loc_list;
+mod spacing;
 
 pub use {
     analyzers::*,
@@ -56,4 +57,5 @@ pub use {
     line_number::*,
     loc::*,
     loc_list::*,
+    spacing::*,
 };
