@@ -42,11 +42,16 @@ impl Loc {
         &self,
         s: &str,
     ) -> bool {
-        self.content.trim_start().starts_with(s)
+        self.content[self.indent..].starts_with(s)
     }
     /// the last character which is not a whitespace or part of a comment
     pub fn last_significant_char(&self) -> Option<char> {
         self.sort_key.chars().rev().find(|c| !c.is_whitespace())
+    }
+    pub fn is_blank(&self) -> bool {
+        !self.content[self.indent..]
+            .chars()
+            .any(|c| !c.is_whitespace())
     }
     pub fn is_sortable(&self) -> bool {
         !self.is_annotation && !self.sort_key.is_empty()
