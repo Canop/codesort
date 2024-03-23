@@ -123,6 +123,7 @@ impl LocList {
             for gift in &loc.gifts {
                 if let Some(bix) = wished.iter().rposition(|&w| gift.satisfies(w)) {
                     wished.remove(bix);
+                } else {
                 }
             }
             for wish in &loc.wishes {

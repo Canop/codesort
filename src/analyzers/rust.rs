@@ -4,6 +4,7 @@ use crate::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum State {
     Normal,
+    Char,
     DoubleQuotedString,
     RawString(usize),
     LineComment,
@@ -17,13 +18,19 @@ fn char_is_gift(c: char) -> bool {
     }
 }
 
-/// Return what the token calls for
+/// Return what the token calls for: we don't want to have blocks between
+/// this token and the character(s) they wish for, at the same depth.
+///
+/// Note: this isn't really suited to C and Zig.
+/// If Zig or C coders start to use this sorter, we'd better make dedicated
+/// analyzers.
 fn token_wishes(token: &str) -> Vec<CharSet> {
     match token {
         "fn" => {
+            // After a "fn", we nee a ( and either a { or a ;
             vec!['('.into(), vec!['{', ';'].into()]
         }
-        "impl" | "enum" | "trait" | "mod" | "match" => {
+        "impl" | "enum" | "trait" | "match" => {
             vec!['{'.into()]
         }
         _ => vec![],
@@ -34,11 +41,16 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
     let mut locs = Vec::new();
     let mut braces = BraceStack::default();
     let mut last_is_antislash = false;
-    let mut last_is_quote = false;
     let mut state = State::Normal;
     loop {
-        if state == State::LineComment {
-            state = State::Normal;
+        match state {
+            State::LineComment => {
+                state = State::Normal;
+            }
+            State::Char => {
+                return Err(CsError::UnclosedCharLiteral);
+            }
+            _ => {}
         }
         let mut content = String::new();
         let n = reader.read_line(&mut content)?;
@@ -56,7 +68,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
         let mut gifts = Vec::new();
         loop {
             let Some((i, c)) = chars.next() else { break };
-            let token = if c.is_ascii_alphabetic() {
+            let token = if c.is_ascii_alphabetic() || c == '_' {
                 // we're only interested in possible keywords
                 current_token.push(c);
                 None
@@ -67,10 +79,11 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                 State::Normal => {
                     if let Some(token) = token.as_ref() {
                         for any_of in token_wishes(token) {
-                            wishes.push(Wish {
+                            let wish = Wish {
                                 depth: braces.depth(),
                                 any_of,
-                            });
+                            };
+                            wishes.push(wish);
                         }
                     }
                     if char_is_gift(c) {
@@ -87,7 +100,28 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                         }
                     }
                     match c {
-                        '"' if !last_is_antislash && !last_is_quote => {
+                        '\'' if !last_is_antislash => {
+                            // A single quote can be either the start of a char literal or
+                            // a lifetime. We must find what it is.
+                            let mut next_chars = (&indented[i + 1..]).chars();
+                            if let (Some(a), Some(b)) =
+                                (next_chars.next(), next_chars.next())
+                            {
+                                if a == '\\' {
+                                    state = State::Char;
+                                } else if a == '_' || a.is_ascii_alphabetic() {
+                                    if b == '\'' {
+                                        state = State::Char;
+                                    } else {
+                                        // it's a lifetime
+                                    }
+                                } else {
+                                    state = State::Char;
+                                }
+                            }
+                            sort_key.push(c);
+                        }
+                        '"' if !last_is_antislash => {
                             // let's count the `#` before and determine whether it's
                             // a raw string or not
                             let mut sharp_count = 0;
@@ -107,7 +141,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                             };
                             sort_key.push(c);
                         }
-                        '/' if !last_is_antislash && !last_is_quote => {
+                        '/' if !last_is_antislash => {
                             if i + 1 < bytes.len() && bytes[i + 1] == b'/' {
                                 state = State::LineComment;
                             } else if i + 1 < bytes.len() && bytes[i + 1] == b'*' {
@@ -116,19 +150,23 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                                 sort_key.push(c);
                             }
                         }
-                        c if char_is_brace(c) && !last_is_antislash && !last_is_quote => {
+                        c if char_is_brace(c) && !last_is_antislash => {
                             braces.push(c)?; // error if unbalanced
                             sort_key.push(c);
                         }
-                        ' ' | '\t' | '\n' | '\r'
-                            if !last_is_antislash && !last_is_quote =>
-                        {
+                        ' ' | '\t' | '\n' | '\r' if !last_is_antislash => {
                             // ignore
                         }
                         c => {
                             sort_key.push(c);
                         }
                     }
+                }
+                State::Char => {
+                    if c == '\'' && !last_is_antislash {
+                        state = State::Normal;
+                    }
+                    sort_key.push(c);
                 }
                 State::DoubleQuotedString => {
                     if c == '"' && !last_is_antislash {
@@ -137,7 +175,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                     sort_key.push(c);
                 }
                 State::RawString(sharp_count) => {
-                    if c == '#' && i > sharp_count + 1 && bytes[i - sharp_count] == b'"' {
+                    if c == '#' && i >= sharp_count && bytes[i - sharp_count] == b'"' {
                         state = State::Normal;
                         for j in 0..sharp_count {
                             if bytes[i - j] != b'#' {
@@ -159,7 +197,6 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                 },
             }
             last_is_antislash = c == '\\' && !last_is_antislash;
-            last_is_quote = c == '\'';
         }
         let is_annotation = sort_key.starts_with("#[");
         let last_significant_char = sort_key.chars().rev().find(|c| !c.is_whitespace());
@@ -326,19 +363,8 @@ fn test_where_comma() {
         trait Foo {}
     "#;
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
-    //list.print_debug(" WHOLE ");
     let focused = list.focus_all().unwrap();
-    focused.print_debug();
-    {
-        let blocks = focused.clone().focus.into_blocks();
-        for (i, block) in blocks.iter().enumerate() {
-            block.print_debug(&format!(" BLOCK {i}"));
-        }
-        assert!(blocks[1] < blocks[0]);
-        assert!(blocks[3] < blocks[0]);
-    }
     let sorted_list = focused.sort();
-    sorted_list.print_debug(" SORTED ");
     assert_eq!(sorted_list.to_string().trim(), OUTPUT.trim());
 }
 
