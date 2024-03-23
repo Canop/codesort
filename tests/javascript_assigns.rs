@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 #[test]
 fn test_javascript_assigns() {
@@ -353,16 +350,20 @@ fn test_javascript_assigns() {
         });
     "#;
 
-    let list = List::from_str(INPUT, Language::JavaScript).unwrap();
-    list.tprint();
+    let list = LocList::read_str(INPUT, Language::Javascript).unwrap();
     let range = LineNumberRange {
         start: LineNumber::new(9).unwrap(),
         end: LineNumber::new(171).unwrap(),
     };
-    let window = list.window_on_line_range(range).unwrap();
-
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    println!("{}", output);
-    assert_eq!(output, OUTPUT);
+    let focused = list.focus(range).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }

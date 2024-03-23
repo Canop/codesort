@@ -158,9 +158,17 @@ static OUTPUT: &str = r#"
 
 #[test]
 fn test_match_big_enum() {
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    println!("{}", list.lines[7]);
-    assert!(list.lines[7].starts_with("Internal"));
-    let window = list.window_around(7).unwrap();
-    assert_eq!(window.sort().unwrap().to_string(), OUTPUT,);
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
+    //list.print_debug(" WHOLE ");
+    let focused = list.focus_around_line_index(7).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }

@@ -3,7 +3,7 @@
 //! in an IDE or a text editor, or as a library.
 //!
 //! ```rust
-//! use codesort::{List, Language};
+//! use codesort::{LocList, Language};
 //! let input = r#"
 //! pub enum ContentSearchResult {
 //!     /// the file wasn't searched because it's binary or too big
@@ -30,31 +30,30 @@
 //! }
 //! "#;
 //!
-//! let list = List::from_str(input, Language::Rust).unwrap();
-//! let window = list.window_around(5).unwrap();
+//! let list = LocList::read_str(input, Language::Rust).unwrap();
+//! let focused = list.focus_around_line_index(5).unwrap();
 //! assert_eq!(
-//!     window.sort().unwrap().to_string(),
+//!     focused.sort().to_string(),
 //!     output,
 //! );
 //! ```
 
-mod balanced;
-mod block;
+mod analyzers;
+mod brace_stack;
 mod error;
-mod languages;
-mod line;
+mod focused;
+mod gifts;
 mod line_number;
-mod list;
-mod tprint;
-mod window;
+mod loc;
+mod loc_list;
 
 pub use {
-    balanced::*,
-    block::*,
+    analyzers::*,
+    brace_stack::*,
     error::*,
-    languages::*,
-    line::*,
+    focused::*,
+    gifts::*,
     line_number::*,
-    list::*,
-    window::*,
+    loc::*,
+    loc_list::*,
 };

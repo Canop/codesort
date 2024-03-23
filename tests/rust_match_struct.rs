@@ -1,7 +1,4 @@
-use {
-    codesort::*,
-    std::fmt::Write,
-};
+use codesort::*;
 
 static INPUT: &str = r#"
 pub fn on_event(
@@ -67,13 +64,16 @@ pub fn on_event(
 
 #[test]
 fn test_match_struct() {
-    let list = List::from_str(INPUT, Language::Rust).unwrap();
-    println!("{}", list.lines[17].content());
-    assert!(list.lines[17].starts_with("TimedEvent {"));
-    let window = list.window_around(17).unwrap();
-    dbg!((window.start, window.end));
-    assert_eq!(window.len(), 17);
-    let mut output = String::new();
-    write!(output, "{}", window.sort().unwrap()).unwrap();
-    assert_eq!(output, OUTPUT);
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
+    let focused = list.focus_around_line_index(17).unwrap();
+    focused.print_debug();
+    {
+        let blocks = focused.clone().focus.into_blocks();
+        for (i, block) in blocks.iter().enumerate() {
+            block.print_debug(&format!(" BLOCK {i}"));
+        }
+    }
+    let sorted_list = focused.sort();
+    sorted_list.print_debug(" SORTED ");
+    assert_eq!(sorted_list.to_string(), OUTPUT);
 }
