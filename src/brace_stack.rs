@@ -34,6 +34,12 @@ impl BraceStack {
     pub fn depth(&self) -> usize {
         self.braces.len()
     }
+    pub fn is_in(
+        &self,
+        brace: char,
+    ) -> bool {
+        self.braces.contains(&brace)
+    }
 }
 
 pub fn char_is_brace(c: char) -> bool {

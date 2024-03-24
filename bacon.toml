@@ -20,6 +20,7 @@ command = [
 	"-A", "clippy::collapsible_else_if",
 	"-A", "clippy::collapsible_if",
 	"-A", "clippy::derive_partial_eq_without_eq",
+	"-A", "clippy::len_without_is_empty",
 	"-A", "clippy::manual_find",
 	"-A", "clippy::match_like_matches_macro",
 	"-A", "clippy::needless_bool",

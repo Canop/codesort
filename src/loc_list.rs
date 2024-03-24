@@ -30,6 +30,17 @@ impl LocList {
         Self::read(s.as_bytes(), lang)
     }
 
+    pub fn read_file(
+        s: &str,
+        lang: Language,
+    ) -> CsResult<LocList> {
+        let s = std::fs::read_to_string(s)?;
+        Self::read(s.as_bytes(), lang)
+    }
+
+    pub fn len(&self) -> usize {
+        self.locs.len()
+    }
     pub fn focus_all(self) -> CsResult<Focused> {
         Ok(Focused {
             before: LocList::default(),
@@ -125,9 +136,7 @@ impl LocList {
         let mut wished = Vec::new();
         for loc in &self.locs {
             for gift in &loc.gifts {
-                if let Some(bix) = wished.iter().rposition(|&w| gift.satisfies(w)) {
-                    wished.remove(bix);
-                }
+                wished.retain(|&w| !gift.satisfies(w));
             }
             for wish in &loc.wishes {
                 wished.push(wish);

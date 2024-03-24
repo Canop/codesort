@@ -21,6 +21,9 @@ fn char_is_gift(c: char) -> bool {
 /// Return what the token calls for: we don't want to have blocks between
 /// this token and the character(s) they wish for, at the same depth.
 ///
+/// Only one wish is considered at a time, and they're ignored when deep into
+/// a '[' or '(' list.
+///
 /// Note: this isn't really suited to C and Zig.
 /// If Zig or C coders start to use this sorter, we'd better make dedicated
 /// analyzers.
@@ -42,13 +45,15 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
     let mut braces = BraceStack::default();
     let mut last_is_antislash = false;
     let mut state = State::Normal;
+    let mut unsatisfied_wish = None;
+    let mut line_index = 0;
     loop {
         match state {
             State::LineComment => {
                 state = State::Normal;
             }
             State::Char => {
-                return Err(CsError::UnclosedCharLiteral);
+                return Err(CsError::UnclosedCharLiteral(line_index - 1));
             }
             _ => {}
         }
@@ -77,13 +82,19 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
             };
             match state {
                 State::Normal => {
-                    if let Some(token) = token.as_ref() {
-                        for any_of in token_wishes(token) {
-                            let wish = Wish {
-                                depth: braces.depth(),
-                                any_of,
-                            };
-                            wishes.push(wish);
+                    if unsatisfied_wish.is_none()
+                        && !braces.is_in('[')
+                        && !braces.is_in('(')
+                    {
+                        // only one wish considered at a time
+                        if let Some(token) = token.as_ref() {
+                            for any_of in token_wishes(token) {
+                                let wish = Wish {
+                                    depth: braces.depth(),
+                                    any_of,
+                                };
+                                wishes.push(wish);
+                            }
                         }
                     }
                     if char_is_gift(c) {
@@ -91,13 +102,18 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                             depth: braces.depth(),
                             c,
                         };
+                        wishes.retain(|wish| !gift.satisfies(wish));
+                        if let Some(wish) = unsatisfied_wish.as_ref() {
+                            if gift.satisfies(wish) {
+                                unsatisfied_wish = None;
+                            }
+                        }
                         if let Some(bix) =
                             wishes.iter().rposition(|wish| gift.satisfies(wish))
                         {
                             wishes.remove(bix);
-                        } else {
-                            gifts.push(gift);
                         }
+                        gifts.push(gift);
                     }
                     match c {
                         '\'' if !last_is_antislash => {
@@ -132,13 +148,11 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                                     break;
                                 }
                             }
-                            state = if sharp_count > 0
-                                && bytes[i - sharp_count - 1] == b'r'
-                            {
-                                State::RawString(sharp_count)
+                            if i > sharp_count && bytes[i - sharp_count - 1] == b'r' {
+                                state = State::RawString(sharp_count);
                             } else {
-                                State::DoubleQuotedString
-                            };
+                                state = State::DoubleQuotedString;
+                            }
                             sort_key.push(c);
                         }
                         '/' if !last_is_antislash => {
@@ -175,10 +189,10 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                     sort_key.push(c);
                 }
                 State::RawString(sharp_count) => {
-                    if c == '#' && i >= sharp_count && bytes[i - sharp_count] == b'"' {
+                    if c == '"' {
                         state = State::Normal;
                         for j in 0..sharp_count {
-                            if bytes[i - j] != b'#' {
+                            if i + 1 + j >= bytes.len() || bytes[i + j + 1] != b'#' {
                                 state = State::RawString(sharp_count);
                                 break;
                             }
@@ -213,6 +227,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
             wishes,
             gifts,
         });
+        line_index += 1;
     }
     Ok(LocList { locs })
 }
@@ -369,8 +384,10 @@ fn test_where_comma() {
 }
 
 /// Traps:
-/// - badly indented code (because it's not easy with raw strings)
+/// - badly indented code
 /// - quoted double-quote
+/// - raw strings with no '#'
+/// - a very sadistic r#"#"#
 #[test]
 fn test_completion_rust() {
     let test_cases = vec![
@@ -382,9 +399,24 @@ fn test_completion_rust() {
         r#"   SpecialHandlingShortcut::None => SpecialHandling {
            show: Default, list: Default, sum: Default,
        },"#,
+        r##"#[test]
+        fn test_unescape_char_bad() {
+            check("", EscapeError::ZeroChars);
+            check(r"\", EscapeError::LoneSlash);
+            check("\n", EscapeError::EscapeOnlyChar);
+            check("\t", EscapeError::EscapeOnlyChar);
+            check("'", EscapeError::EscapeOnlyChar);
+            check("\r", EscapeError::BareCarriageReturn);
+        }"##,
+        r###"
+        fn fun() {
+            let tricky = r#"#"#;
+        }
+        "###,
     ];
     for code in test_cases {
         let list = LocList::read_str(code, Language::Rust).unwrap();
+        list.print_debug(" test ");
         assert!(list.is_complete());
     }
 }

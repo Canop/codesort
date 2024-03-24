@@ -24,8 +24,8 @@ pub enum CsError {
     #[error("Unexpected closing brace: {0}")]
     UnexpectedClosingBrace(char),
 
-    #[error("Unclosed char literal")]
-    UnclosedCharLiteral,
+    #[error("Unclosed char literal at line {}", .0+1)]
+    UnclosedCharLiteral(LineIndex),
 
     #[error("Provided input not balanced")]
     InputNotBalanced,
