@@ -9,15 +9,27 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
+static EXCLUDED_DIRS: &[&str] = &[
+    ".git", "target", "test",
+    //"tests",
+];
+
 /// Launch arguments
 #[derive(Debug, Parser)]
 #[command(about, version)]
 pub struct Args {
+    /// directories normally excluded to include
+    #[clap(long, default_value = "")]
+    pub include: Vec<String>,
+
     /// Path to the file(s)
     pub path: Option<PathBuf>,
 }
 
-pub fn get_all_rust_files(root: PathBuf) -> io::Result<Vec<PathBuf>> {
+pub fn get_all_rust_files(
+    root: PathBuf,
+    include: &[String],
+) -> io::Result<Vec<PathBuf>> {
     let mut files = Vec::new();
     // if we're given a single file, it's probably because the user
     // wants to sort it, so we don't check the extension
@@ -33,9 +45,14 @@ pub fn get_all_rust_files(root: PathBuf) -> io::Result<Vec<PathBuf>> {
                 continue;
             };
             if path.is_dir() {
-                if file_name.starts_with('.') || file_name == "target" {
-                    // in a more serious program, we would check .gitignore
+                if file_name.starts_with('.') {
                     continue;
+                }
+                if EXCLUDED_DIRS.contains(&file_name) {
+                    if !include.iter().any(|inc| inc == file_name) {
+                        eprintln!("{} {:?}", "Excluded".yellow(), path);
+                        continue;
+                    }
                 }
                 dirs.push(path.to_path_buf());
                 continue;
@@ -52,7 +69,7 @@ pub fn get_all_rust_files(root: PathBuf) -> io::Result<Vec<PathBuf>> {
 
 fn main() {
     let args = Args::parse();
-    let files = get_all_rust_files(args.path.unwrap()).unwrap();
+    let files = get_all_rust_files(args.path.unwrap(), &args.include).unwrap();
     eprintln!("Found {} rust files", files.len());
     let mut no_complete_count = 0;
     let mut errors = 0;

@@ -8,7 +8,7 @@ enum State {
     DoubleQuotedString,
     RawString(usize),
     LineComment,
-    StarComment,
+    BlockComment(usize),
 }
 
 fn char_is_gift(c: char) -> bool {
@@ -159,7 +159,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                             if i + 1 < bytes.len() && bytes[i + 1] == b'/' {
                                 state = State::LineComment;
                             } else if i + 1 < bytes.len() && bytes[i + 1] == b'*' {
-                                state = State::StarComment;
+                                state = State::BlockComment(0);
                             } else {
                                 sort_key.push(c);
                             }
@@ -203,9 +203,18 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                 State::LineComment => {
                     // ignore
                 }
-                State::StarComment => match c {
+                State::BlockComment(depth) => match c {
                     '/' if i > 0 && bytes[i - 1] == b'*' => {
-                        state = State::Normal;
+                        if depth > 0 {
+                            state = State::BlockComment(depth - 1);
+                        } else {
+                            state = State::Normal;
+                        }
+                    }
+                    '/' if !last_is_antislash => {
+                        if i + 1 < bytes.len() && bytes[i + 1] == b'*' {
+                            state = State::BlockComment(depth + 1);
+                        }
                     }
                     _ => {}
                 },
