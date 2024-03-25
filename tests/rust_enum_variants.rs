@@ -83,17 +83,7 @@ fn test_enum_variants_simple_without_space() {
     }
     "#;
 
-    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
-    //list.print_debug(" WHOLE ");
-    let focused = list.focus_around_line_index(6).unwrap();
-    focused.print_debug();
-    {
-        let blocks = focused.clone().focus.into_blocks();
-        for (i, block) in blocks.iter().enumerate() {
-            block.print_debug(&format!(" BLOCK {i}"));
-        }
-    }
-    let sorted_list = focused.sort();
-    sorted_list.print_debug(" SORTED ");
-    assert_eq!(sorted_list.to_string(), OUTPUT);
+    let mut list = LocList::read_str(INPUT, Language::Rust).unwrap();
+    list.sort_around_line_index(6).unwrap();
+    assert_eq!(list.to_string(), OUTPUT);
 }

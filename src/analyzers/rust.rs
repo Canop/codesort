@@ -300,7 +300,7 @@ fn test_match_arms() {
     assert!(list.locs[5].starts_with("SpecialHandlingShortcut::None"));
     assert!(list.locs[8].starts_with("SpecialHandlingShortcut::Enter"));
     assert!(list.locs[8] < list.locs[5]);
-    let range = list.range_around_idx(8).unwrap();
+    let range = list.range_around_line_index(8).unwrap();
     assert_eq!(
         range,
         LineNumberRange {

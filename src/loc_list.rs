@@ -3,6 +3,8 @@ use {
     std::{
         cmp::Ordering,
         fmt,
+        fs,
+        path::Path,
     },
 };
 
@@ -22,25 +24,58 @@ impl LocList {
     ) -> CsResult<Self> {
         lang.analyzer().read(reader)
     }
-
     pub fn read_str(
         s: &str,
         lang: Language,
     ) -> CsResult<LocList> {
         Self::read(s.as_bytes(), lang)
     }
-
-    pub fn read_file(
-        s: &str,
+    pub fn read_file<P: AsRef<Path>>(
+        path: P,
         lang: Language,
     ) -> CsResult<LocList> {
-        let s = std::fs::read_to_string(s)?;
+        let s = fs::read_to_string(path)?;
         Self::read(s.as_bytes(), lang)
+    }
+    pub fn write_file<P: AsRef<Path>>(
+        &self,
+        path: P,
+    ) -> CsResult<()> {
+        fs::write(path, self.to_string())?;
+        Ok(())
     }
 
     pub fn len(&self) -> usize {
         self.locs.len()
     }
+
+    pub fn sort_range(
+        &mut self,
+        range: LineNumberRange,
+    ) -> CsResult<()> {
+        let list = LocList {
+            locs: std::mem::take(&mut self.locs),
+        };
+        let focused = list.focus(range)?;
+        let sorted = focused.sort();
+        self.locs = sorted.locs;
+        Ok(())
+    }
+    pub fn sort_around_line_index(
+        &mut self,
+        line_index: LineIndex,
+    ) -> CsResult<()> {
+        let range = self.range_around_line_index(line_index)?;
+        self.sort_range(range)
+    }
+    pub fn sort_around_line_number(
+        &mut self,
+        line_number: LineNumber,
+    ) -> CsResult<()> {
+        let range = self.range_around_line_number(line_number)?;
+        self.sort_range(range)
+    }
+
     pub fn focus_all(self) -> CsResult<Focused> {
         Ok(Focused {
             before: LocList::default(),
@@ -76,14 +111,14 @@ impl LocList {
         self,
         line_idx: LineIndex,
     ) -> CsResult<Focused> {
-        let range = self.range_around_idx(line_idx)?;
+        let range = self.range_around_line_index(line_idx)?;
         self.focus(range)
     }
     pub fn focus_around_line_number(
         self,
         line_number: LineNumber,
     ) -> CsResult<Focused> {
-        let range = self.range_around_idx(line_number.to_index())?;
+        let range = self.range_around_line_index(line_number.to_index())?;
         self.focus(range)
     }
 
@@ -105,11 +140,24 @@ impl LocList {
         self.locs.iter().take_while(|loc| loc.is_blank()).count()
     }
     pub fn has_content(&self) -> bool {
-        self.locs
-            .iter()
-            .any(|loc| !loc.is_annotation && !loc.sort_key.is_empty())
+        let Some(first_start_depth) = self.locs.first().map(|loc| loc.start_depth) else {
+            return false;
+        };
+        let mut has_not_annotation = false; // considering only root level locs
+        let mut has_sortable = false;
+        for loc in &self.locs {
+            if loc.start_depth == first_start_depth {
+                if loc.is_sortable() {
+                    has_not_annotation |= !loc.is_annotation;
+                }
+            }
+            if has_not_annotation {
+                has_sortable |= loc.is_sortable();
+            }
+        }
+        has_not_annotation && has_sortable
     }
-    pub fn las_significant_char(&self) -> Option<char> {
+    pub fn last_significant_char(&self) -> Option<char> {
         self.locs
             .iter()
             .rev()
@@ -144,13 +192,62 @@ impl LocList {
         }
         wished.is_empty()
     }
+    pub fn is_complete_d(
+        &self,
+        debug: bool,
+    ) -> bool {
+        if debug {
+            self.print_debug(" IS_COMPLETE ? ");
+        }
+        if !self.has_content() {
+            if debug {
+                println!("no content");
+            }
+            return false;
+        }
+        if debug {
+            println!("sort key: {:?}", &self.locs.last().unwrap().sort_key);
+        }
+        let (Some(first), Some(last)) =
+            (self.locs.first(), self.last_line_with_content())
+        else {
+            return false;
+        };
+        if first.start_depth != last.end_depth {
+            if debug {
+                println!("no same depth");
+            }
+            return false;
+        }
+        if !last.can_complete {
+            if debug {
+                println!("no can compete");
+            }
+            return false;
+        }
+        let mut wished = Vec::new();
+        for loc in &self.locs {
+            for gift in &loc.gifts {
+                wished.retain(|&w| !gift.satisfies(w));
+            }
+            for wish in &loc.wishes {
+                wished.push(wish);
+            }
+        }
+        if debug {
+            println!("wished empty? {}", wished.is_empty());
+        }
+        wished.is_empty()
+    }
     pub fn into_blocks(self) -> Vec<LocList> {
         let mut blocs = Vec::new();
         let mut current = LocList::default();
+        let mut debug = false;
         for loc in self.locs {
             current.locs.push(loc);
-            if current.is_complete() {
+            if current.is_complete_d(debug) {
                 blocs.push(std::mem::take(&mut current));
+                debug = false;
             }
         }
         if !current.locs.is_empty() {
@@ -158,7 +255,13 @@ impl LocList {
         }
         blocs
     }
-    pub fn range_around_idx(
+    pub fn range_around_line_number(
+        &self,
+        line_number: LineNumber,
+    ) -> CsResult<LineNumberRange> {
+        self.range_around_line_index(line_number.to_index())
+    }
+    pub fn range_around_line_index(
         &self,
         line_idx: LineIndex,
     ) -> CsResult<LineNumberRange> {

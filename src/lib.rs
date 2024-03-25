@@ -30,12 +30,9 @@
 //! }
 //! "#;
 //!
-//! let list = LocList::read_str(input, Language::Rust).unwrap();
-//! let focused = list.focus_around_line_index(5).unwrap();
-//! assert_eq!(
-//!     focused.sort().to_string(),
-//!     output,
-//! );
+//! let mut list = LocList::read_str(input, Language::Rust).unwrap();
+//! list.sort_around_line_index(5).unwrap();
+//! assert_eq!(list.to_string(), output);
 //! ```
 
 mod analyzers;

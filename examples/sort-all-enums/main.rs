@@ -1,6 +1,7 @@
 use {
     clap::Parser,
     codesort::*,
+    lazy_regex::*,
     std::{
         fs,
         io,
@@ -9,9 +10,13 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
-static EXCLUDED_DIRS: &[&str] = &[".git", "target", "test"];
+static EXCLUDED_DIRS: &[&str] = &[".git", "target", "build"];
 
-/// Launch arguments
+/// Sort all enums of all rust files found in the given directory
+///
+/// Are excluded
+/// - files in .git, target and build directories
+/// - files which don't appear correct enough
 #[derive(Debug, Parser)]
 #[command(about, version)]
 pub struct Args {
@@ -64,36 +69,53 @@ pub fn get_all_rust_files(
     Ok(files)
 }
 
-fn main() {
+fn main() -> CsResult<()> {
     let args = Args::parse();
-    let files = get_all_rust_files(args.path, &args.include).unwrap();
+    let files = get_all_rust_files(args.path, &args.include)?;
     eprintln!("Found {} rust files", files.len());
-    let mut no_complete_count = 0;
-    let mut errors = 0;
+    let mut enum_count = 0;
+    let mut not_complete_count = 0;
     let mut ok_count = 0;
-    for file in files {
-        let loc_list = LocList::read_file(file.to_str().unwrap(), Language::Rust);
-        let loc_list = match loc_list {
+    for file in &files {
+        let loc_list = LocList::read_file(file, Language::Rust);
+        let mut loc_list = match loc_list {
             Ok(loc_list) => loc_list,
             Err(e) => {
-                eprintln!("{} {:?} : {}", "ERROR".red(), file, e);
-                errors += 1;
+                eprintln!("{} in {}: {:?}", "ERROR".red(), file.display(), e);
                 continue;
             }
         };
-        if loc_list.is_complete() {
-            ok_count += 1;
-            continue;
-        }
         if !loc_list.has_content() {
-            eprintln!("{} {:?}", "EMPTY".yellow(), file);
-            ok_count += 1;
             continue;
         }
-        eprintln!("{} {:?}", "NOT COMPLETE".yellow(), file);
-        no_complete_count += 1;
+        if !loc_list.is_complete() {
+            eprintln!("skipping {} (not consistent enough)", file.display());
+            not_complete_count += 1;
+            continue;
+        }
+        let mut modified = false;
+        let mut line_idx = 0;
+        ok_count += 1;
+        while line_idx + 2 < loc_list.len() {
+            let content = &loc_list.locs[line_idx].content;
+            let Some((_, name)) =
+                regex_captures!(r"\benum\s+([^({]+)\s+\{\s**$", content)
+            else {
+                line_idx += 1;
+                continue;
+            };
+            let range = loc_list.range_around_line_index(line_idx + 1).unwrap();
+            eprintln!("Sorting enum {}", name.blue());
+            loc_list.sort_range(range).unwrap();
+            line_idx = range.end.to_index() + 2;
+            enum_count += 1;
+            modified = true;
+        }
+        if modified {
+            loc_list.write_file(file)?;
+        }
     }
-    eprintln!("OK files: {}", ok_count);
-    eprintln!("Erroring files: {}", errors);
-    eprintln!("Uncomplete files: {}", no_complete_count);
+    eprintln!("I sorted {} enums in {} files", enum_count, ok_count);
+    eprintln!("I encountered {} not complete files", not_complete_count);
+    Ok(())
 }
