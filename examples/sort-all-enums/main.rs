@@ -97,9 +97,10 @@ fn main() -> CsResult<()> {
         let mut line_idx = 0;
         ok_count += 1;
         while line_idx + 2 < loc_list.len() {
-            let content = &loc_list.locs[line_idx].content;
+            let loc = &loc_list.locs[line_idx];
+            let content = &loc.content;
             let Some((_, name)) =
-                regex_captures!(r"\benum\s+([^({]+)\s+\{\s**$", content)
+                regex_captures!(r"^[\s\w()]*\benum\s+([^({]+)\s+\{\s**$", content)
             else {
                 line_idx += 1;
                 continue;
@@ -113,6 +114,11 @@ fn main() -> CsResult<()> {
         }
         if modified {
             loc_list.write_file(file)?;
+            eprintln!("wrote {}", file.display());
+        }
+        if enum_count >= 150 {
+            eprintln!("stop");
+            break;
         }
     }
     eprintln!("I sorted {} enums in {} files", enum_count, ok_count);
