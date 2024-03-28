@@ -57,6 +57,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
             }
             _ => {}
         }
+        let starts_normal = state == State::Normal;
         let mut content = String::new();
         let n = reader.read_line(&mut content)?;
         if n == 0 {
@@ -235,6 +236,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
             can_complete,
             wishes,
             gifts,
+            starts_normal,
         });
         line_index += 1;
     }

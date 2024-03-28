@@ -63,6 +63,22 @@ pub fn on_event(
 "#;
 
 #[test]
+fn test_match_struct_ranges() {
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
+    list.print_debug("TOTAL");
+    let inner_range = list.range_around_line_index(15).unwrap();
+    let blocks = list.block_ranges_in_range(inner_range);
+    assert_eq!(
+        blocks,
+        vec![
+            "9:15".parse().unwrap(),
+            "16:23".parse().unwrap(),
+            "24:25".parse().unwrap(),
+        ]
+    );
+}
+
+#[test]
 fn test_match_struct() {
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     let focused = list.focus_around_line_index(17).unwrap();

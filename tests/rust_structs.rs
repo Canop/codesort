@@ -57,6 +57,24 @@ pub struct PanelCmdContext<'c> {
 "#;
 
 #[test]
+fn test_find_struct_range() {
+    let list = LocList::read_str(INPUT, Language::Rust).unwrap();
+    list.print_debug(" WHOLE ");
+    assert_eq!(
+        list.block_range_of_line_number(line_number!(3)).unwrap(),
+        "1:8".parse().unwrap(),
+    );
+    assert_eq!(
+        list.block_range_of_line_number(line_number!(17)).unwrap(),
+        "9:17".parse().unwrap(),
+    );
+    assert_eq!(
+        list.block_range_of_line_number(line_number!(20)).unwrap(),
+        "18:26".parse().unwrap(),
+    );
+}
+
+#[test]
 fn test_match_struct() {
     let list = LocList::read_str(INPUT, Language::Rust).unwrap();
     //list.print_debug(" WHOLE ");

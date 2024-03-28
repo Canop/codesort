@@ -30,6 +30,8 @@ pub struct Loc {
     pub wishes: Vec<Wish>,
     /// gifts not required by this loc
     pub gifts: Vec<Gift>,
+    /// Before the first char, is the line normal (not a comment or a multi line literal) ?
+    pub starts_normal: bool,
 }
 
 impl Loc {

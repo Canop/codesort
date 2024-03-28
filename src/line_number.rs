@@ -67,6 +67,47 @@ impl LineNumber {
     }
 }
 
+impl LineNumberRange {
+    /// Make a range spanning one line
+    pub fn of_line(start: LineNumber) -> Self {
+        LineNumberRange { start, end: start }
+    }
+    pub fn contains(
+        self,
+        line: LineNumber,
+    ) -> bool {
+        self.start <= line && line <= self.end
+    }
+}
+
+pub struct LineNumberRangeIter {
+    next: LineNumber,
+    end: LineNumber,
+}
+impl Iterator for LineNumberRangeIter {
+    type Item = LineNumber;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.next > self.end {
+            return None;
+        }
+        let current = self.next;
+        self.next = LineNumber {
+            number: NonZeroUsize::new(current.number.get() + 1).unwrap(),
+        };
+        Some(current)
+    }
+}
+impl IntoIterator for LineNumberRange {
+    type Item = LineNumber;
+    type IntoIter = LineNumberRangeIter;
+    fn into_iter(self) -> Self::IntoIter {
+        LineNumberRangeIter {
+            next: self.start,
+            end: self.end,
+        }
+    }
+}
+
 impl std::fmt::Display for LineNumber {
     fn fmt(
         &self,
@@ -82,4 +123,17 @@ impl std::fmt::Display for LineNumberRange {
     ) -> std::fmt::Result {
         write!(f, "{}:{}", self.start, self.end)
     }
+}
+
+/// A macro to create a `LineNumber` from a literal
+#[macro_export]
+macro_rules! line_number {
+    (0) => {
+        compile_error!("Line numbers are 1-based, so 0 is not a valid line number");
+    };
+    ($n:literal) => {
+        LineNumber {
+            number: unsafe { std::num::NonZeroUsize::new_unchecked($n) },
+        }
+    };
 }

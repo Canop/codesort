@@ -121,31 +121,105 @@ impl LocList {
         let range = self.range_around_line_index(line_number.to_index())?;
         self.focus(range)
     }
-
+    pub fn line_at_number(
+        &self,
+        line_number: LineNumber,
+    ) -> Option<&Loc> {
+        self.locs.get(line_number.to_index())
+    }
+    pub fn print_range_debug(
+        &self,
+        label: &str,
+        range: LineNumberRange,
+    ) {
+        println!("{label:=^80}");
+        for ln in range {
+            let loc = self.line_at_number(ln);
+            match loc {
+                Some(loc) => {
+                    println!(
+                        "{:>4} {:>2}-{:<2} | {:<30}",
+                        ln,
+                        loc.start_depth,
+                        loc.end_depth,
+                        loc.content.trim_end(),
+                    );
+                }
+                None => {
+                    println!("{:>3} | <no loc>", ln);
+                }
+            }
+        }
+    }
     pub fn print_debug(
         &self,
         label: &str,
     ) {
-        println!("{label:=^80}");
-        for (i, loc) in self.locs.iter().enumerate() {
-            println!(
-                "{i:>3} {:>2}-{:<2} | {:<30}",
-                loc.start_depth,
-                loc.end_depth,
-                loc.content.trim_end(),
-            );
+        let Some(range) = self.full_range_checked() else {
+            println!("{}: <empty>", label);
+            return;
+        };
+        self.print_range_debug(label, range);
+    }
+    pub fn trimmed_range(
+        &self,
+        mut range: LineNumberRange,
+    ) -> LineNumberRange {
+        while range.start < range.end && self.locs[range.start.to_index()].is_blank() {
+            range.start = LineNumber::from_index(range.start.to_index() + 1);
         }
+        while range.end > range.start && self.locs[range.end.to_index()].is_blank() {
+            range.end = LineNumber::from_index(range.end.to_index() - 1);
+        }
+        range
     }
     pub fn count_blank_lines_at_start(&self) -> usize {
         self.locs.iter().take_while(|loc| loc.is_blank()).count()
     }
-    pub fn has_content(&self) -> bool {
-        let Some(first_start_depth) = self.locs.first().map(|loc| loc.start_depth) else {
+    pub fn full_range(&self) -> LineNumberRange {
+        self.full_range_checked().unwrap()
+    }
+    pub fn full_range_checked(&self) -> Option<LineNumberRange> {
+        if self.locs.is_empty() {
+            None
+        } else {
+            Some(LineNumberRange {
+                start: LineNumber::from_index(0),
+                end: LineNumber::from_index(self.locs.len() - 1),
+            })
+        }
+    }
+    pub fn check_range(
+        &self,
+        range: LineNumberRange,
+    ) -> CsResult<()> {
+        let start = range.start.to_index();
+        let end = range.end.to_index();
+        if start >= self.locs.len() || end >= self.locs.len() || start > end {
+            return Err(CsError::InvalidRange { start, end });
+        }
+        Ok(())
+    }
+    /// Check whether the range is valid and contains at least one line
+    pub fn range_exists(
+        &self,
+        range: LineNumberRange,
+    ) -> bool {
+        let start = range.start.to_index();
+        let end = range.end.to_index();
+        start < self.locs.len() && end < self.locs.len() && start <= end
+    }
+    pub fn range_has_content(
+        &self,
+        range: LineNumberRange,
+    ) -> bool {
+        if !self.range_exists(range) {
             return false;
-        };
+        }
+        let first_start_depth = self.locs[range.start.to_index()].start_depth;
         let mut has_not_annotation = false; // considering only root level locs
         let mut has_sortable = false;
-        for loc in &self.locs {
+        for loc in &self.locs[range.start.to_index()..=range.end.to_index()] {
             if loc.start_depth == first_start_depth {
                 if loc.is_sortable() {
                     has_not_annotation |= !loc.is_annotation;
@@ -154,8 +228,15 @@ impl LocList {
             if has_not_annotation {
                 has_sortable |= loc.is_sortable();
             }
+            if has_not_annotation && has_sortable {
+                return true;
+            }
         }
-        has_not_annotation && has_sortable
+        false
+    }
+    pub fn has_content(&self) -> bool {
+        self.full_range_checked()
+            .map_or(false, |range| self.range_has_content(range))
     }
     pub fn last_significant_char(&self) -> Option<char> {
         self.locs
@@ -166,13 +247,27 @@ impl LocList {
     pub fn last_line_with_content(&self) -> Option<&Loc> {
         self.locs.iter().rev().find(|&loc| loc.is_sortable())
     }
-    pub fn is_complete(&self) -> bool {
-        if !self.has_content() {
+    pub fn last_line_in_range_with_content(
+        &self,
+        range: LineNumberRange,
+    ) -> Option<&Loc> {
+        self.locs[range.start.to_index()..=range.end.to_index()]
+            .iter()
+            .rev()
+            .find(|&loc| loc.is_sortable())
+    }
+    /// Warning: doesn't check whether a bigger range wouldn't be
+    /// complete too, so a range being complete doesn't mean it is
+    /// a block.
+    pub fn is_range_complete(
+        &self,
+        range: LineNumberRange,
+    ) -> bool {
+        if !self.range_has_content(range) {
             return false;
         }
-        let (Some(first), Some(last)) =
-            (self.locs.first(), self.last_line_with_content())
-        else {
+        let first = &self.locs[range.start.to_index()];
+        let Some(last) = self.last_line_in_range_with_content(range) else {
             return false;
         };
         if first.start_depth != last.end_depth {
@@ -182,7 +277,7 @@ impl LocList {
             return false;
         }
         let mut wished = Vec::new();
-        for loc in &self.locs {
+        for loc in &self.locs[range.start.to_index()..=range.end.to_index()] {
             for gift in &loc.gifts {
                 wished.retain(|&w| !gift.satisfies(w));
             }
@@ -192,62 +287,64 @@ impl LocList {
         }
         wished.is_empty()
     }
-    pub fn is_complete_d(
+    pub fn is_complete(&self) -> bool {
+        self.is_range_complete(self.full_range())
+    }
+    /// Assuming the provided range you pass is valid enough, give the ranges of the
+    /// blocks in it.
+    pub fn block_ranges_in_range(
         &self,
-        debug: bool,
-    ) -> bool {
-        if debug {
-            self.print_debug(" IS_COMPLETE ? ");
-        }
-        if !self.has_content() {
-            if debug {
-                println!("no content");
-            }
-            return false;
-        }
-        if debug {
-            println!("sort key: {:?}", &self.locs.last().unwrap().sort_key);
-        }
-        let (Some(first), Some(last)) =
-            (self.locs.first(), self.last_line_with_content())
-        else {
-            return false;
-        };
-        if first.start_depth != last.end_depth {
-            if debug {
-                println!("no same depth");
-            }
-            return false;
-        }
-        if !last.can_complete {
-            if debug {
-                println!("no can compete");
-            }
-            return false;
-        }
-        let mut wished = Vec::new();
-        for loc in &self.locs {
-            for gift in &loc.gifts {
-                wished.retain(|&w| !gift.satisfies(w));
-            }
-            for wish in &loc.wishes {
-                wished.push(wish);
+        range: LineNumberRange,
+    ) -> Vec<LineNumberRange> {
+        let mut blocks = Vec::new();
+        let mut current = LineNumberRange::of_line(range.start);
+        for line_number in range {
+            if self.is_range_complete(current) {
+                blocks.push(current);
+                current = LineNumberRange::of_line(line_number);
+            } else {
+                current.end = line_number;
             }
         }
-        if debug {
-            println!("wished empty? {}", wished.is_empty());
+        if blocks.last().map_or(true, |last| last.end != range.end) {
+            blocks.push(current);
         }
-        wished.is_empty()
+        blocks
+    }
+    /// Find the block the line is part of
+    ///
+    /// For example, if you give the opening line of a struct
+    /// (i.e a like like `pub struct Foo {`), you'll get
+    /// the whole struct with its doc comments, annotations, inner
+    /// fields, til the closing brace. You also get the empty lines
+    /// before which should stick with the block.
+    ///
+    /// If you give the line of a field, you'll get the field definition
+    /// with its own comment and annotation.
+    pub fn block_range_of_line_number(
+        &self,
+        line_number: LineNumber,
+    ) -> CsResult<LineNumberRange> {
+        let range = self.range_around_line_number(line_number)?;
+        let blocks = self.block_ranges_in_range(range);
+        for block in blocks {
+            if block.contains(line_number) {
+                return Ok(block);
+            }
+        }
+        Err(CsError::InvalidRange {
+            // should never happen
+            start: range.start.to_index(),
+            end: range.end.to_index(),
+        })
     }
     pub fn into_blocks(self) -> Vec<LocList> {
         let mut blocs = Vec::new();
         let mut current = LocList::default();
-        let mut debug = false;
         for loc in self.locs {
             current.locs.push(loc);
-            if current.is_complete_d(debug) {
+            if current.is_complete() {
                 blocs.push(std::mem::take(&mut current));
-                debug = false;
             }
         }
         if !current.locs.is_empty() {

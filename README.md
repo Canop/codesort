@@ -141,9 +141,11 @@ Explanation of the command:
 * Java
 * JavaScript
 
-If you want to use codesort in another language, ask or contribute.
+## Contribute
 
-Note: while codesort is much tested on Rust, I'd welcome feedback regarding other languages.
+Codesort is much tested on Rust, but would need tests and probably improvements for other languages.
+
+Whatever the language and use case, please come discuss on [Miaou](https://miaou.dystroy.org/3768).
 
 ## Licence
 
