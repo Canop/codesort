@@ -155,7 +155,7 @@ impl LocList {
         &self,
         label: &str,
     ) {
-        let Some(range) = self.full_range_checked() else {
+        let Some(range) = self.full_range() else {
             println!("{}: <empty>", label);
             return;
         };
@@ -176,10 +176,8 @@ impl LocList {
     pub fn count_blank_lines_at_start(&self) -> usize {
         self.locs.iter().take_while(|loc| loc.is_blank()).count()
     }
-    pub fn full_range(&self) -> LineNumberRange {
-        self.full_range_checked().unwrap()
-    }
-    pub fn full_range_checked(&self) -> Option<LineNumberRange> {
+    /// If the list isn't empty, return a range covering it wholly
+    pub fn full_range(&self) -> Option<LineNumberRange> {
         if self.locs.is_empty() {
             None
         } else {
@@ -235,7 +233,7 @@ impl LocList {
         false
     }
     pub fn has_content(&self) -> bool {
-        self.full_range_checked()
+        self.full_range()
             .map_or(false, |range| self.range_has_content(range))
     }
     pub fn last_significant_char(&self) -> Option<char> {
@@ -288,7 +286,8 @@ impl LocList {
         wished.is_empty()
     }
     pub fn is_complete(&self) -> bool {
-        self.is_range_complete(self.full_range())
+        self.full_range()
+            .map_or(false, |range| self.is_range_complete(range))
     }
     /// Assuming the provided range you pass is valid enough, give the ranges of the
     /// blocks in it.

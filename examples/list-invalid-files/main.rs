@@ -9,7 +9,7 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
-static EXCLUDED_DIRS: &[&str] = &[".git", "target", "test"];
+static EXCLUDED_DIRS: &[&str] = &[".git", "build", "target"];
 
 /// Launch arguments
 #[derive(Debug, Parser)]

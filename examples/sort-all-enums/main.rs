@@ -10,18 +10,15 @@ use {
     termimad::crossterm::style::Stylize,
 };
 
+/// Directories we don't want to touch
 static EXCLUDED_DIRS: &[&str] = &[".git", "target", "build"];
 
+/// Keywords which, if found in the annotations before an enum, will
+/// prevent the enum variants from being sorted
 static EXCLUDING_KEYWORDS: &[&str] = &[
-    "Encodable",
-    "Decodable",
-    "TypeFoldable",
-    "TypeVisitable",
     "repr",
     "serde",
-    "Subdiagnostic",
-    "Diagnostic",
-    "LintDiagnostic",
+    "PartialOrd", "Ord",
 ];
 
 /// Sort all enums of all rust files found in the given directory
@@ -164,35 +161,16 @@ fn main() -> CsResult<()> {
                 whole_enum_range,
             );
             let range = loc_list.range_around_line_index(line_idx + 1).unwrap();
-            //eprintln!("Sorting enum {}", name.blue());
             loc_list.sort_range(range).unwrap();
             line_idx = range.end.to_index() + 2;
             sorted_enum_count += 1;
             modified = true;
         }
         if modified {
-            // let's check the file is still ok after sort, just in case
-            let sorted_file = loc_list.to_string();
-            let loc_list = LocList::read_str(&sorted_file, Language::Rust);
-            match loc_list {
-                Ok(loc_list) if !loc_list.is_complete() => {
-                    eprintln!("{} not complete after sort, aborting!", file.display());
-                    return Ok(());
-                }
-                Err(e) => {
-                    eprintln!("{} invalid after sort, aborting!", file.display());
-                    return Err(e);
-                }
-                _ => {}
-            }
-            fs::write(file, sorted_file)?;
+            loc_list.write_file(file)?;
             eprintln!("wrote {}", file.display());
             modified_files_count += 1;
         }
-        //if enum_count >= 962 {
-        //    eprintln!("stop");
-        //    break;
-        //}
     }
     eprintln!("\nDone in {:.3}s\n", start.elapsed().as_secs_f32());
     eprintln!("I analyzed {} files", files.len());
