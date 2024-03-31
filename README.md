@@ -20,7 +20,7 @@ Of course you can't just sort lines: the code wouldn't work anymore; comments an
 
 And sorting code manually is a tedious task.
 
-**codesort** can do it for you, directly in your IDE.
+**codesort** can do it for you, with a shortcut on the desired part of the code, directly in your IDE.
 
 Here's the before and after of sorting around the cursor's line:
 
@@ -92,9 +92,9 @@ You can also change the input and output to be files, with `--src` and `--dst`.
 
 If necessary, you can provide a filename to codesort for langage detection (the file doesn't have to exist, only the extension of the name will be used, eg `.js`).
 
-Those options make it easy to integrate codesort in any editor. See below for vim.
+Those options make it easy to integrate codesort in any editor. See below for vim and IntelliJ (contributions welcome for other editors).
 
-## Use codesort in vim / neovim
+### Use codesort in vim / neovim
 
 #### Sort the selection
 
@@ -133,28 +133,26 @@ Explanation of the command:
 * the codesort command takes the filename, for langage detection, through `--detect`
 * the previous position is then restored
 
-## Use codesort in IntelliJ
+### Use codesort in IntelliJ
 
-### on range
+#### sort on a range
 
-File -> Settings -> Tools -> External tools:
+Configure the shortcut (File -> Settings -> Tools -> External tools) like this:
 
 Arguments: `--range $SelectionStartLine$:$SelectionEndLine$ $FileDir$/$FileName$`
 
-<details><summary>Settings</summary>
+<details><summary>Settings Screenshot</summary>
 <img src=doc/intellij-range.png>
 </details>
 
 
-To use:
+To use it: right-click selection -> external tools -> codesort
 
-right-click selection -> external tools -> codesort
-
-### around
+#### sort around the current line
 
 Arguments: `--around $LineNumber$ $FileDir$/$FileName$`
 
-<details><summary>Settings</summary>
+<details><summary>Settings Screenshot</summary>
 <img src=doc/intellij-around.png>
 </details>
 
