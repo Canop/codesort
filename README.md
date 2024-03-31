@@ -94,7 +94,7 @@ If necessary, you can provide a filename to codesort for langage detection (the 
 
 Those options make it easy to integrate codesort in any editor. See below for vim.
 
-## Use codesort in vim
+## Use codesort in vim / neovim
 
 #### Sort the selection
 
@@ -132,6 +132,31 @@ Explanation of the command:
 * the codesort command takes the current line number through `--around`
 * the codesort command takes the filename, for langage detection, through `--detect`
 * the previous position is then restored
+
+## Use codesort in IntelliJ
+
+### on range
+
+File -> Settings -> Tools -> External tools:
+
+Arguments: `--range $SelectionStartLine$:$SelectionEndLine$ $FileDir$/$FileName$`
+
+<details><summary>Settings</summary>
+<img src=doc/intellij-range.png>
+</details>
+
+
+To use:
+
+right-click selection -> external tools -> codesort
+
+### around
+
+Arguments: `--around $LineNumber$ $FileDir$/$FileName$`
+
+<details><summary>Settings</summary>
+<img src=doc/intellij-around.png>
+</details>
 
 ## Supported Code kinds
 
