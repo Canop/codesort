@@ -45,6 +45,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
     let mut braces = BraceStack::default();
     let mut last_is_antislash = false;
     let mut state = State::Normal;
+    let mut annotation_start_depth = None;
     let mut unsatisfied_wish = None;
     let mut line_index = 0;
     loop {
@@ -72,6 +73,11 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
         let mut current_token = String::new();
         let mut wishes = Vec::new();
         let mut gifts = Vec::new();
+        if annotation_start_depth.is_none() && state == State::Normal {
+            if indented.starts_with("#[") {
+                annotation_start_depth = Some(braces.depth());
+            }
+        }
         loop {
             let Some((i, c)) = chars.next() else { break };
             let token = if c.is_ascii_alphabetic() || c == '_' {
@@ -136,7 +142,9 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                                     state = State::Char;
                                 }
                             }
-                            sort_key.push(c);
+                            if annotation_start_depth.is_none() {
+                                sort_key.push(c);
+                            }
                         }
                         '"' if !last_is_antislash => {
                             // let's count the `#` before and determine whether it's
@@ -154,26 +162,34 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                             } else {
                                 state = State::DoubleQuotedString;
                             }
-                            sort_key.push(c);
+                            if annotation_start_depth.is_none() {
+                                sort_key.push(c);
+                            }
                         }
                         '/' if !last_is_antislash => {
                             if i + 1 < bytes.len() && bytes[i + 1] == b'/' {
                                 state = State::LineComment;
                             } else if i + 1 < bytes.len() && bytes[i + 1] == b'*' {
                                 state = State::BlockComment(0);
-                            } else {
+                            } else if annotation_start_depth.is_none() {
                                 sort_key.push(c);
                             }
                         }
                         c if char_is_brace(c) && !last_is_antislash => {
                             braces.push(c)?; // error if unbalanced
-                            sort_key.push(c);
+                            if Some(braces.depth()) == annotation_start_depth {
+                                annotation_start_depth = None;
+                            } else if annotation_start_depth.is_none() {
+                                sort_key.push(c);
+                            }
                         }
                         ' ' | '\t' | '\n' | '\r' if !last_is_antislash => {
                             // ignore
                         }
                         c => {
-                            sort_key.push(c);
+                            if annotation_start_depth.is_none() {
+                                sort_key.push(c);
+                            }
                         }
                     }
                 }
@@ -181,13 +197,17 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                     if c == '\'' && !last_is_antislash {
                         state = State::Normal;
                     }
-                    sort_key.push(c);
+                    if annotation_start_depth.is_none() {
+                        sort_key.push(c);
+                    }
                 }
                 State::DoubleQuotedString => {
                     if c == '"' && !last_is_antislash {
                         state = State::Normal;
                     }
-                    sort_key.push(c);
+                    if annotation_start_depth.is_none() {
+                        sort_key.push(c);
+                    }
                 }
                 State::RawString(sharp_count) => {
                     if c == '"' {
@@ -199,7 +219,9 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
                             }
                         }
                     }
-                    sort_key.push(c);
+                    if annotation_start_depth.is_none() {
+                        sort_key.push(c);
+                    }
                 }
                 State::LineComment => {
                     // ignore
@@ -222,7 +244,7 @@ pub fn read<R: std::io::BufRead>(mut reader: R) -> CsResult<LocList> {
             }
             last_is_antislash = c == '\\' && !last_is_antislash;
         }
-        let is_annotation = sort_key.starts_with("#[");
+        let is_annotation = indented.starts_with("#[");
         let last_significant_char = sort_key.chars().rev().find(|c| !c.is_whitespace());
         let can_complete = last_significant_char
             .map_or(false, |c| char_is_brace(c) || c == ',' || c == ';');

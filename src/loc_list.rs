@@ -137,13 +137,7 @@ impl LocList {
             let loc = self.line_at_number(ln);
             match loc {
                 Some(loc) => {
-                    println!(
-                        "{:>4} {:>2}-{:<2} | {:<30}",
-                        ln,
-                        loc.start_depth,
-                        loc.end_depth,
-                        loc.content.trim_end(),
-                    );
+                    println!("{:>4} | {:<30}", ln.to_string(), loc.content.trim_end(),);
                 }
                 None => {
                     println!("{:>3} | <no loc>", ln);

@@ -15,11 +15,7 @@ static EXCLUDED_DIRS: &[&str] = &[".git", "target", "build"];
 
 /// Keywords which, if found in the annotations before an enum, will
 /// prevent the enum variants from being sorted
-static EXCLUDING_KEYWORDS: &[&str] = &[
-    "repr",
-    "serde",
-    "PartialOrd", "Ord",
-];
+static EXCLUDING_KEYWORDS: &[&str] = &["repr", "serde", "PartialOrd", "Ord"];
 
 /// Sort all enums of all rust files found in the given directory
 ///
