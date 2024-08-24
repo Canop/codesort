@@ -19,7 +19,7 @@ explain = []
 clap = { version = "4.4", features = ["derive", "cargo"] }
 clap-help = "1.2"
 include_dir = "0.7"
-lazy-regex = "3"
+lazy-regex = "3.3"
 termimad = "0.29"
 thiserror = "1.0"
 
