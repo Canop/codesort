@@ -170,6 +170,10 @@ Codesort is much tested on Rust, but would need tests and probably improvements 
 
 Whatever the language and use case, please come discuss on [Miaou](https://miaou.dystroy.org/3768).
 
+## More info
+
+Here's an article explaining how CodeSort works: https://dystroy.org/blog/sort-code/
+
 ## Licence
 
 **codesort** is licenced under [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html).
