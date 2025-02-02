@@ -1,9 +1,9 @@
 use {
     codesort::*,
     include_dir::{
-        include_dir,
         Dir,
         DirEntry,
+        include_dir,
     },
 };
 
