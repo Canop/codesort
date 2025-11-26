@@ -1,6 +1,6 @@
 [package]
 name = "codesort"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["dystroy <denys.seguret@gmail.com>"]
 repository = "https://github.com/Canop/codesort"
 edition = "2021"
@@ -20,6 +20,6 @@ clap = { version = "4.5", features = ["derive", "cargo"] }
 clap-help = "1.3"
 include_dir = "0.7"
 lazy-regex = "3.4"
-termimad = "0.31"
+termimad = "0.34"
 thiserror = "1.0"
 
